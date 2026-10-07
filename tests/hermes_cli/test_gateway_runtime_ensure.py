@@ -115,7 +115,11 @@ def test_public_ensure_json_deadline_and_invalid_invocation(tmp_path):
     assert callable(getattr(runtime, "ensure_gateway_runtime", None))
     home = tmp_path / "profile"
     home.mkdir(mode=0o700)
-    (home / ".hermes-update-in-progress").write_text("private-token-not-for-stdout", encoding="utf-8")
+    # A LIVE claim (this test process, at its own incarnation) fences; a dead one would not.
+    from hermes_cli.update_lock import process_create_time
+    (home / ".hermes-update-in-progress").write_text(
+        f"{os.getpid()}\n{int(time.time())}\nct:{process_create_time():.3f}\nrun:private-token-not-for-stdout\n",
+        encoding="utf-8")
     env = {**os.environ, "HERMES_HOME": str(home)}
     result = subprocess.run([sys.executable, "-m", "hermes_cli.main", "gateway", "ensure", "--json"],
                             env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=15)
@@ -132,6 +136,29 @@ def test_public_ensure_json_deadline_and_invalid_invocation(tmp_path):
     assert result.returncode == 2
     assert json.loads(result.stdout)["reason_code"] == "invalid_invocation"
     assert "private-value" not in result.stdout
+
+
+def test_update_fence_follows_update_lock_judgement(tmp_path, monkeypatch):
+    """A killed update's dead or malformed marker never blocks a launch (main's launch contract);
+    the same marker fences while the checkout lock is held, and a live claim always fences."""
+    from hermes_cli import gateway_runtime as runtime, update_lock
+    from hermes_cli.update_lock import process_create_time
+
+    marker = tmp_path / update_lock.MARKER_NAME
+    dead = subprocess.Popen([sys.executable, "-c", "pass"])
+    dead_ct = process_create_time(dead.pid)
+    dead.wait(timeout=30)
+    held = []
+    monkeypatch.setattr(update_lock, "checkout_lock_held", lambda *a, **k: bool(held))
+    for body in (f"{dead.pid}\n{int(time.time())}\nct:{dead_ct or 1.0:.3f}\n", "not a marker"):
+        marker.write_text(body, encoding="utf-8")
+        assert not runtime._update_fenced({tmp_path}), body
+        held.append(True)
+        assert runtime._update_fenced({tmp_path}), body
+        held.clear()
+    marker.write_text(f"{os.getpid()}\n{int(time.time())}\nct:{process_create_time():.3f}\n", encoding="utf-8")
+    assert runtime._update_fenced({tmp_path})
+    assert marker.is_file()  # read-only: a client never clears the updater's fence
 
 
 @pytest.mark.platforms("linux")

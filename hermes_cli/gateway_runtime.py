@@ -179,6 +179,36 @@ def discover_gateway_endpoint(profile_home: str | Path, *, timeout: float = 2.0)
         return GatewayDiscovery("inaccessible", reason_code="invalid_control_peer")
 
 
+def _update_fenced(homes) -> bool:
+    """True while an update owns the install, judged the way main's launchers and the Desktop
+    judge ``.hermes-update-in-progress``: a live (or still being written) marker, or a dead or
+    malformed one while the checkout lock is held (a killed update's tree still runs). A dead
+    marker over a free lock is a killed update: it never blocks a launch.
+
+    Read-only: a client never clears the updater's fence; the launch-time reclaim
+    (``update_lock.read_live_update``) and the next update remove a dead marker. A marker that
+    exists but cannot be read is unjudgeable and fences.
+    """
+    import time
+    from hermes_cli import update_lock
+
+    for fence_home in homes:
+        path = fence_home / update_lock.MARKER_NAME
+        try:
+            raw = path.read_bytes()
+            if not raw:
+                # An exclusive first publish in flight (contract A3), not yet a dead claim.
+                if time.time() - path.stat().st_mtime < update_lock.EMPTY_MARKER_GRACE_SECONDS:
+                    return True
+        except FileNotFoundError:
+            continue
+        except OSError:
+            return True
+        if update_lock.judge_marker(raw)[0] in {"live", "ours"} or update_lock.checkout_lock_held():
+            return True
+    return False
+
+
 def ensure_gateway_runtime(profile_home: str | Path, *, timeout: float = DEFAULT_ENSURE_TIMEOUT) -> GatewayDiscovery:
     """Ensure once, never install/replace; pending remains pending at deadline.
 
@@ -190,7 +220,6 @@ def ensure_gateway_runtime(profile_home: str | Path, *, timeout: float = DEFAULT
         RuntimeStartError, discover_existing_gateway_service, remaining,
         start_existing_gateway_service,
     )
-    from hermes_cli.update_lock import MARKER_NAME
     from hermes_constants import get_default_hermes_root, get_process_hermes_home
 
     if not math.isfinite(timeout) or timeout <= 0:
@@ -201,13 +230,8 @@ def ensure_gateway_runtime(profile_home: str | Path, *, timeout: float = DEFAULT
     delay = 0.025
     try:
         while True:
-            # Never clear the updater's fence, even if malformed. Repair is not
-            # a client operation. The install-root marker also covers profiles.
-            for fence_home in {home, get_process_hermes_home(), get_default_hermes_root()}:
-                try:
-                    (fence_home / MARKER_NAME).lstat()
-                except FileNotFoundError:
-                    continue
+            # The install-root marker also covers profiles.
+            if _update_fenced({home, get_process_hermes_home(), get_default_hermes_root()}):
                 return GatewayDiscovery("draining", reason_code="update_paused")
             observed = discover_gateway_endpoint(home, timeout=remaining(deadline))
             if observed.reason_code == "control_timeout":
