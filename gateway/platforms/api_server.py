@@ -487,7 +487,7 @@ def _normalize_image_part(part: Dict[str, Any]) -> Dict[str, Any]:
             raise ValueError(
                 "unsupported_content_type:Only image data URLs are supported. "
                 "Non-image data payloads are not supported.")
-    elif not (lowered.startswith("http://") or lowered.startswith("https://")):
+    elif not (lowered.startswith(("http://", "https://"))):
         raise ValueError(
             "invalid_image_url:Image inputs must use http(s) URLs or data:image/... URLs.")
     image_part: Dict[str, Any] = {"type": "image_url", "image_url": {"url": url_value}}

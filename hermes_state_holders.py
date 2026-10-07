@@ -89,7 +89,7 @@ def _python_execution_target(argv: Sequence[str]) -> Optional[Tuple[str, str]]:
         if arg in _PYTHON_LONG_OPTIONS_WITH_OPERANDS:
             index += 2
             continue
-        if arg.startswith("--check-hash-based-pycs=") or arg.startswith("--jit="):
+        if arg.startswith(("--check-hash-based-pycs=", "--jit=")):
             index += 1
             continue
         if arg.startswith("--"):

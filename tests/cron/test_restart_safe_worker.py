@@ -610,7 +610,7 @@ def test_launch_external_worker_degrades_by_default_with_real_helper(
 
     job = {"id": "job-1", "execution_id": "exec-1", "prompt": "work"}
     monkeypatch.setattr(scheduler, "_get_hermes_home", lambda: tmp_path)
-    monkeypatch.setattr(scheduler, "load_config_readonly", lambda: {})
+    monkeypatch.setattr(scheduler, "load_config_readonly", dict)
     monkeypatch.setattr(process_registry, "_is_supervised_gateway_process", lambda: True)
     monkeypatch.setenv("INVOCATION_ID", "managed-service")
     monkeypatch.setattr(process_registry, "_systemd_run_user_scope_available", lambda: False)
@@ -1338,7 +1338,7 @@ def test_restart_wait_counts_exclude_only_scoped_workers(tmp_path, monkeypatch):
     import cron.scheduler as scheduler
 
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
-    monkeypatch.setattr("cron.jobs.load_jobs", lambda: [])
+    monkeypatch.setattr("cron.jobs.load_jobs", list)
     jobs = ("job-scoped", "job-degraded", "job-scoped-wedged")
     for job_id in jobs:
         assert scheduler.try_register_running_job(job_id)

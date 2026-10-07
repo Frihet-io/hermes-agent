@@ -142,7 +142,7 @@ def test_close_keeps_a_reused_descriptors_new_owner(tmp_path, monkeypatch):
         original_close(fd)
         reopened.append(os.open(second, os.O_RDONLY))
 
-    guard = HomeIOGuard(lambda: [])
+    guard = HomeIOGuard(list)
     try:
         with monkeypatch.context() as patcher:
             patcher.setattr(os, "close", close_and_reopen)

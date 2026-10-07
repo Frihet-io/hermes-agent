@@ -135,7 +135,7 @@ class TestPluginDiscovery:
             "_collect_directory_manifests",
             lambda: [manifest],
         )
-        monkeypatch.setattr(manager, "_scan_entry_points", lambda: [])
+        monkeypatch.setattr(manager, "_scan_entry_points", list)
         monkeypatch.setattr(
             plugins_mod,
             "_get_enabled_plugins",

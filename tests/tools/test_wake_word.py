@@ -290,7 +290,7 @@ def test_tts_ready_is_a_probe_never_an_installer(monkeypatch):
     )  # use the real implementation
     fake_tts = _types.SimpleNamespace(
         _get_provider=lambda cfg: "edge",
-        _load_tts_config=lambda: {},
+        _load_tts_config=dict,
         check_tts_requirements=lambda: (_ for _ in ()).throw(
             AssertionError("check_tts_requirements must not run when deps are missing")
         ),

@@ -719,7 +719,7 @@ def _redact_python_diagnostic_repr_fields(text: str) -> str:
         body_line = line
         if line.endswith("\r\n"):
             body_line, ending = line[:-2], "\r\n"
-        elif line.endswith("\n") or line.endswith("\r"):
+        elif line.endswith(("\n", "\r")):
             body_line, ending = line[:-1], line[-1:]
 
         match = _PYTEST_DIAGNOSTIC_LINE_RE.match(body_line)

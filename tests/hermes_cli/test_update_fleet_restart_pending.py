@@ -182,7 +182,7 @@ def _patch_update_deps(monkeypatch, tmp_path, run_side_effect):
     )
     monkeypatch.setattr(
         "hermes_cli.update_inventory.collect_runtime_inventory",
-        lambda: SimpleNamespace(runtimes=[], to_dict=lambda: {}),
+        lambda: SimpleNamespace(runtimes=[], to_dict=dict),
     )
     # The restart phase imports discovery fns fresh after
     # _purge_stale_hermes_modules (the update reloads code in-place), so

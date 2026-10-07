@@ -50,7 +50,7 @@ def _no_other_copilot_creds(monkeypatch):
     import hermes_cli.auth as auth
     import hermes_cli.model_switch as model_switch
 
-    monkeypatch.setattr(auth, "_load_auth_store", lambda: {})
+    monkeypatch.setattr(auth, "_load_auth_store", dict)
     monkeypatch.setattr(model_switch_providers, "_credential_pool_is_usable", lambda *a, **k: False)
 
 

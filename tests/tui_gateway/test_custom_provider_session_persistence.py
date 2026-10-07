@@ -81,7 +81,7 @@ class TestRuntimeModelConfigPersistsEntryIdentity:
 
 
     def test_keeps_bare_custom_when_no_entry_matches(self, monkeypatch):
-        monkeypatch.setattr(rp, "load_config", lambda: {})
+        monkeypatch.setattr(rp, "load_config", dict)
 
         from tui_gateway.server import _runtime_model_config
 
@@ -424,7 +424,7 @@ class TestStaleProviderNameFallsBack:
         configured default instead of failing the build."""
         config = {"custom_providers": NAMED_CONFIG["custom_providers"]}
         monkeypatch.setattr(rp, "load_config", lambda: config)
-        monkeypatch.setattr(rp, "_get_model_config", lambda: {})
+        monkeypatch.setattr(rp, "_get_model_config", dict)
 
         from tui_gateway.server import _stored_session_runtime_overrides
 

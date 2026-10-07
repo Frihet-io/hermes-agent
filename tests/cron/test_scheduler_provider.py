@@ -226,7 +226,7 @@ def test_resolve_no_cron_section_falls_back_to_builtin(monkeypatch):
     import hermes_cli.config as cfg
     from cron import scheduler_provider as sp
 
-    monkeypatch.setattr(cfg, "load_config", lambda: {})
+    monkeypatch.setattr(cfg, "load_config", dict)
     prov = sp.resolve_cron_scheduler()
     assert prov.name == "builtin"
 

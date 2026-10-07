@@ -272,7 +272,7 @@ def build_env(monkeypatch, tmp_path):
         ("_notify_session_boundary", lambda *a, **k: None),
         ("_session_info", lambda *a, **k: {}),
         ("_probe_config_health", lambda _cfg: None),
-        ("_load_cfg", lambda: {}),
+        ("_load_cfg", dict),
         ("_emit", lambda *a, **k: None),
         ("_schedule_mcp_late_refresh", lambda *a, **k: None),
         ("_session_source", lambda _current: None),

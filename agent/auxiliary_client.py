@@ -619,7 +619,7 @@ def _is_codex_gpt54_or_gpt55(model: Optional[str], provider: Optional[str] = Non
     if "astra" in bare:
         return "900k" not in bare
     return bare == "gpt-daybreak-blue-latest" or any(
-        bare == fam or bare.startswith(fam + "-") or bare.startswith(fam + ".")
+        bare == fam or bare.startswith((fam + "-", fam + "."))
         for fam in ("gpt-5.4", "gpt-5.5", "gpt-5.6", "gpt-6-sol", "gpt-6.1-sol", "gpt-6-luna"))
 
 
@@ -1099,7 +1099,7 @@ def _is_anthropic_compatible_host(url: str) -> bool:
         if (parsed.hostname or "").strip().lower().rstrip(".") in _ANTHROPIC_COMPATIBLE_HOSTS:
             return True
         path = (parsed.path or "").rstrip("/").lower()
-        return path.endswith("/anthropic") or path.endswith("/anthropic/v1")
+        return path.endswith(("/anthropic", "/anthropic/v1"))
     except Exception:
         return False
 

@@ -121,7 +121,7 @@ def _acceptable_image_ref(value: str) -> bool:
     """OpenRouter fetches the frame itself, so it needs a public HTTPS URL or an inline ``data:image/`` URL
     (what the sandbox confinement chokepoint hands us for local files)."""
     lowered = value.lower()
-    return lowered.startswith("https://") or lowered.startswith("data:image/")
+    return lowered.startswith(("https://", "data:image/"))
 
 
 def _build_payload(

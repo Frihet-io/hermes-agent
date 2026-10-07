@@ -155,7 +155,7 @@ def is_nt_namespace_path(path: str) -> bool:
     if s.startswith("\\\\?\\"):
         rest = s[4:]
         upper = rest.upper()
-        if upper.startswith("UNC\\") or upper.startswith("GLOBALROOT\\"):
+        if upper.startswith(("UNC\\", "GLOBALROOT\\")):
             return True
     return False
 

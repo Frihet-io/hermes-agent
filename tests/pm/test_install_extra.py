@@ -40,7 +40,7 @@ def test_cold_runtime_refusal_names_the_extra(monkeypatch, tmp_path):
     from pm.package import InstallError
 
     monkeypatch.setattr("pm.install.lazy_installs_allowed", lambda: False)
-    monkeypatch.setattr(client, "runtime_environment", lambda: {})
+    monkeypatch.setattr(client, "runtime_environment", dict)
     monkeypatch.setattr("pm.registry.package_definitions", lambda names: [])
     monkeypatch.setattr(client, "runtime_command", lambda *args, **kwargs: (_ for _ in ()).throw(
         InstallError("pm-runtime", "not installed or outdated and lazy installs are disabled")))

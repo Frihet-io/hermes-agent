@@ -125,7 +125,7 @@ def _extract_overview(body: str) -> str:
                 continue
         if p.startswith(":::"):
             continue
-        if p.startswith("```") or p.startswith("~~~"):
+        if p.startswith(("```", "~~~")):
             continue
         if len(p) > 500:
             cut = p[:500]

@@ -471,7 +471,7 @@ def project_for_path(conn: sqlite3.Connection, path: str, *, include_archived: b
 
     def owns(folder: str) -> bool:
         stem = folder.rstrip("/\\")
-        return target == folder or target.startswith(stem + os.sep) or target.startswith(stem + "/")
+        return target == folder or target.startswith((stem + os.sep, stem + "/"))
 
     owners = [row for row in conn.execute(sql).fetchall() if owns(row["folder"])]
     return get_project(conn, max(owners, key=lambda r: len(r["folder"]))["pid"]) if owners else None

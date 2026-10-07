@@ -1062,7 +1062,7 @@ def _prune_orphaned_branches(repo_root: str, protect: Optional[set] = None) -> N
     active_branches.add("main")
 
     orphaned = [b for b in all_branches if b not in active_branches and b not in (protect or ())
-                and (b.startswith("hermes/hermes-") or b.startswith("pr-"))]
+                and (b.startswith(("hermes/hermes-", "pr-")))]
 
     if not orphaned:
         return

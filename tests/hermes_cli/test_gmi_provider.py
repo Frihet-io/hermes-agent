@@ -147,8 +147,8 @@ class TestGmiDoctor:
         try:
             from hermes_cli import auth as _auth_mod
 
-            monkeypatch.setattr(_auth_mod, "get_nous_auth_status", lambda: {})
-            monkeypatch.setattr(_auth_mod, "get_codex_auth_status", lambda: {})
+            monkeypatch.setattr(_auth_mod, "get_nous_auth_status", dict)
+            monkeypatch.setattr(_auth_mod, "get_codex_auth_status", dict)
         except Exception as _exc:
             logging.debug("Suppressed exception: %s", _exc, exc_info=True)
 

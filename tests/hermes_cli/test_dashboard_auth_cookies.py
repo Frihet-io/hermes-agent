@@ -100,8 +100,7 @@ def test_session_cookies_use_bare_name_on_http():
     # Bare name present; no __Host- / __Secure- variant emitted.
     assert any(c.startswith(f"{SESSION_AT_COOKIE}=") for c in cookies)
     assert not any(
-        c.startswith(f"__Host-{SESSION_AT_COOKIE}=")
-        or c.startswith(f"__Secure-{SESSION_AT_COOKIE}=")
+        c.startswith((f"__Host-{SESSION_AT_COOKIE}=", f"__Secure-{SESSION_AT_COOKIE}="))
         for c in cookies
     )
     # No Secure flag (HTTP).

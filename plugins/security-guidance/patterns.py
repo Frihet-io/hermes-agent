@@ -148,7 +148,7 @@ def _rule(name, reminder, **triggers):
 # allow_pickle=True (default False since numpy 1.16.3).
 SECURITY_PATTERNS = [
     _rule("github_actions_workflow", _GITHUB_ACTIONS_REMINDER,
-          path_check=lambda path: ".github/workflows/" in path and (path.endswith(".yml") or path.endswith(".yaml"))),
+          path_check=lambda path: ".github/workflows/" in path and (path.endswith((".yml", ".yaml")))),
     _rule("child_process_exec", _CHILD_PROCESS_EXEC_REMINDER, path_filter=_JS_ONLY, substrings=["child_process.exec", "execSync("], regex=r"(?<![a-zA-Z0-9_\.])exec\("),
     _rule("new_function_injection",
           "\u26a0\ufe0f Security Warning: Using new Function() with string interpolation is a CODE INJECTION vulnerability. If any variable is concatenated or interpolated into the function body string, an attacker controlling that variable can execute arbitrary code. Use safe alternatives: for property access use obj[key] or array.reduce((o, k) => o[k], root); for computation use a safe expression parser. NEVER interpolate untrusted strings into new Function() bodies.",

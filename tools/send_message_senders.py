@@ -362,7 +362,7 @@ async def _resolve_slack_user_target(token, chat_id):
     """Resolve ``user:U...`` / ``user_name:<handle>`` to a D... DM conversation (chat.postMessage
     needs a conversation ID); ``user_name:`` goes through users.list first (stable handle match
     only); other ids pass through. ``(chat_id, None)`` or ``(None, error_dict)``."""
-    if not (chat_id.startswith("user:") or chat_id.startswith("user_name:")):
+    if not (chat_id.startswith(("user:", "user_name:"))):
         return chat_id, None
     try:
         import aiohttp

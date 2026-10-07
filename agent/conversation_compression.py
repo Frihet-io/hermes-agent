@@ -1595,7 +1595,7 @@ def _mark_compression_blocked_transient(agent: Any, compressor: Any) -> None:
     if callable(reason_fn):
         with _swallow('compression block-reason read failed', exc_info=True):
             reason = reason_fn()
-    if isinstance(reason, str) and (reason.startswith("cooldown") or reason.startswith("structural_backoff")):
+    if isinstance(reason, str) and (reason.startswith(("cooldown", "structural_backoff"))):
         logger.info(
             "Skipping automatic compression re-entry: transient guard "
             "active (%s, session=%s, last failure: %s) — will retry after "

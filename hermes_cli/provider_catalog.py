@@ -45,7 +45,7 @@ def tab_for_auth_type(auth_type: str) -> str:
 
 
 def _is_url_var(name: str) -> bool:
-    return name.endswith("_BASE_URL") or name.endswith("_URL")
+    return name.endswith(("_BASE_URL", "_URL"))
 
 
 def _split_env_vars(env_vars: tuple[str, ...]) -> tuple[tuple[str, ...], str]:

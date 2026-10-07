@@ -148,7 +148,7 @@ class TestCacheImageFromUrlConnectGuard:
         # through ``urllib.request.getproxies``, which on macOS falls back to the System
         # Configuration (``scutil --proxy``) when no proxy env var is set — so on a runner
         # with a system-wide proxy the request would dial the proxy, not the rebinding host.
-        monkeypatch.setattr("httpx._utils.getproxies", lambda: {})
+        monkeypatch.setattr("httpx._utils.getproxies", dict)
 
         answers = [
             [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 80))],

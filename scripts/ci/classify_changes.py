@@ -482,7 +482,7 @@ RUN_E2E_LABEL = "run-e2e"
 def _is_docs(p: str) -> bool:
     if p.startswith(("skills/", "optional-skills/")):
         return False
-    return p.endswith((".md", ".mdx")) or p.startswith("docs/") or p.startswith("LICENSE")
+    return p.endswith((".md", ".mdx")) or p.startswith(("docs/", "LICENSE"))
 
 
 def _is_nix(p: str) -> bool:

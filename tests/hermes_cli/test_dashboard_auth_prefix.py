@@ -463,7 +463,7 @@ class TestCookiePathRespectsPrefix:
         )
         # And no __Host- / __Secure- variant accidentally emitted.
         assert not any(
-            c.startswith("__Host-") or c.startswith("__Secure-")
+            c.startswith(("__Host-", "__Secure-"))
             for c in cookies
         )
 

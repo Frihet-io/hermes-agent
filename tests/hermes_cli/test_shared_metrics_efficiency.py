@@ -214,7 +214,7 @@ def test_prompt_rebuild_names_a_model_switch_apart_from_other_rebuilds(monkeypat
 
 
 def test_nothing_is_recorded_while_disabled(direct_runtime, tmp_path, monkeypatch):
-    monkeypatch.setattr("hermes_cli.config.read_raw_config_readonly", lambda: {})
+    monkeypatch.setattr("hermes_cli.config.read_raw_config_readonly", dict)
     agent = _agent()
     eff.note_tool_result(agent, "terminal", "c1", "x" * 10, "x" * 10)
     assert not getattr(agent, "_shared_metrics_tool_outputs", None)

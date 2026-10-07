@@ -272,7 +272,7 @@ class Cell:
 
     def spawn(self, script: str, role: str, extra: dict | None = None) -> subprocess.Popen:
         env = {k: v for k, v in os.environ.items()
-               if not (k.endswith("_API_KEY") or k.endswith("_BOT_TOKEN"))}
+               if not (k.endswith(("_API_KEY", "_BOT_TOKEN")))}
         inherited = env.get("PYTHONPATH")
         env.update({
             "PYTHONPATH": f"{REPO_ROOT}{os.pathsep}{inherited}" if inherited else str(REPO_ROOT),

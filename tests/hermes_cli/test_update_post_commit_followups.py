@@ -175,7 +175,7 @@ def test_owed_restart_names_its_gateways_so_a_dead_fleet_cannot_discharge_it(tmp
     assert [(r["kind"], r["profile"]) for r in inventory["runtimes"]] == [("gateway", "default")]
     # HEAD still holds the pulled code, so only the fleet evidence can settle it.
     monkeypatch.setattr(fleet, "_current_checkout_sha", lambda: "a" * 40)
-    monkeypatch.setattr("hermes_cli.update_receipt.collect_fleet_versions", lambda: [])
+    monkeypatch.setattr("hermes_cli.update_receipt.collect_fleet_versions", list)
     assert fleet._marker_only_restart_obsolete() is False
     assert fleet._fleet_restart_obligation_armed()
 
@@ -190,7 +190,7 @@ def test_owed_restart_rearms_a_settled_obligation_and_a_later_run_keeps_owing_it
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     monkeypatch.setenv("HERMES_GATEWAY_LOCK_DIR", str(tmp_path / "locks"))
     monkeypatch.setattr(fleet, "_current_checkout_sha", lambda: "b" * 40)
-    monkeypatch.setattr("hermes_cli.update_receipt.collect_fleet_versions", lambda: [])
+    monkeypatch.setattr("hermes_cli.update_receipt.collect_fleet_versions", list)
     assert not fleet._fleet_restart_obligation_armed()
     fleet_verify._record_owed_gateway_inventory(UpdatePlan(runtimes=[RuntimeRecord(kind="gateway", profile="default")]))
     assert fleet._obligation_fields()["expected_sha"] == "b" * 40

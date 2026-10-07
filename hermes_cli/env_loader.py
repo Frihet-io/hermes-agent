@@ -400,7 +400,7 @@ def _sanitize_env_file_if_needed(path: Path) -> None:
 
     # ORDER MATTERS: BOM_UTF32_LE (FF FE 00 00) startswith BOM_UTF16_LE (FF FE); UTF-16 first would mangle it.
     force_utf8_rewrite = False
-    if raw.startswith(codecs.BOM_UTF32_LE) or raw.startswith(codecs.BOM_UTF32_BE):
+    if raw.startswith((codecs.BOM_UTF32_LE, codecs.BOM_UTF32_BE)):
         # Lazy import keeps the module import block identical to #65124's codecs/io additions so the two PRs
         # auto-merge either order.
         path_key = str(path.resolve())
@@ -409,7 +409,7 @@ def _sanitize_env_file_if_needed(path: Path) -> None:
             logger.warning("Skipping .env sanitize for %s: UTF-32 BOM detected; "
                            "leaving file untouched to avoid corruption", path)
         return
-    if raw.startswith(codecs.BOM_UTF16_LE) or raw.startswith(codecs.BOM_UTF16_BE):
+    if raw.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)):
         # "utf-16" uses the BOM for endianness and strips it; newline=None matches open()'s universal
         # newlines (not splitlines()'s extra boundaries like U+2028) so sanitize sees the same lines.
         try:

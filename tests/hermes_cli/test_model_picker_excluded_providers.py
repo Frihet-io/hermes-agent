@@ -63,7 +63,7 @@ def _capture_provider_labels(config_home):
 def test_cli_picker_hides_excluded_provider(config_home):
     """``excluded_providers: [openrouter]`` must remove the OpenRouter row
     from the ``hermes model`` provider menu."""
-    _write_config(config_home, **{"model_catalog": {"excluded_providers": ["openrouter"]}})
+    _write_config(config_home, model_catalog={"excluded_providers": ["openrouter"]})
 
     labels = _capture_provider_labels(config_home)
     assert labels, "provider menu was empty"
@@ -108,7 +108,7 @@ def test_cli_picker_hides_excluded_provider_by_alias(config_home):
     # Excluding by alias hides it.
     _write_config(
         config_home,
-        **{"model_catalog": {"excluded_providers": [target_alias]}},
+        model_catalog={"excluded_providers": [target_alias]},
     )
     excluded_labels = _capture_provider_labels(config_home)
     assert not any(target_label_fragment in lbl for lbl in excluded_labels), (
@@ -119,7 +119,7 @@ def test_cli_picker_hides_excluded_provider_by_alias(config_home):
 
 def test_cli_picker_empty_excluded_is_noop(config_home):
     """An empty ``excluded_providers`` list must not change the menu."""
-    _write_config(config_home, **{"model_catalog": {"excluded_providers": []}})
+    _write_config(config_home, model_catalog={"excluded_providers": []})
     excluded_labels = _capture_provider_labels(config_home)
 
     _write_config(config_home)

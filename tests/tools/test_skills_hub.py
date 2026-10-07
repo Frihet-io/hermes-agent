@@ -297,7 +297,7 @@ class TestSkillsShSource:
             if url.endswith("/contents/"):
                 # Root listing for shallow scan — return empty so it falls through
                 resp.status_code = 200
-                resp.json = lambda: []
+                resp.json = list
                 return resp
             if "/contents/" in url:
                 # All contents API calls fail (candidate paths miss)
@@ -414,7 +414,7 @@ class TestRepoRootSkillLayout:
                 resp.status_code, resp.content = 200, self.SKILL_MD.encode()
             elif url.endswith("/contents/references/free_tools.md"):
                 resp.status_code, resp.content = 200, b"# Free tools\n"
-            elif url.endswith("/contents/LICENSE") or url.endswith("/contents/README.md"):
+            elif url.endswith(("/contents/LICENSE", "/contents/README.md")):
                 # Every blob in the pinned tree must fetch, or the bundle is "incomplete" and
                 # deliberately left unpinned (empty revision) for the next update check to fill.
                 resp.status_code, resp.content = 200, b"root-level file\n"

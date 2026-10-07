@@ -72,7 +72,7 @@ def test_add_list_remove_roundtrip(monkeypatch, capsys):
 
 
 def test_add_rejects_bad_name_and_url(monkeypatch):
-    monkeypatch.setattr(peer_cmd, "_load_peers", lambda: {})
+    monkeypatch.setattr(peer_cmd, "_load_peers", dict)
     monkeypatch.setattr(peer_cmd, "_save_peers", lambda peers: None)
 
     assert peer_cmd.cmd_peer(SimpleNamespace(peer_action="add", name="Bad Name!", url="http://x", key="", note="")) == 2

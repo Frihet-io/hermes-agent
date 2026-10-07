@@ -919,7 +919,7 @@ def gateway_setup():
     # Meaningful progress on any platform; ``_platform_status`` already handles plugin dual states.
     def _is_progress(status: str) -> bool:
         s = status.lower()
-        return not (s == "not configured" or s.startswith("partially") or s.startswith("plugin disabled"))
+        return not (s == "not configured" or s.startswith(("partially", "plugin disabled")))
 
     if any(_is_progress(_gw()._platform_status(p)) for p in _gw()._all_platforms()):
         _gw()._wizard_post_setup()

@@ -133,7 +133,7 @@ def _install_compression_failure_agent(monkeypatch, agent_cls=_CompressionThenFa
     monkeypatch.setitem(sys.modules, "run_agent", fake_run_agent)
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "off")
     monkeypatch.setenv("HERMES_AGENT_TIMEOUT", "0")
-    monkeypatch.setattr(gateway_run, "_load_gateway_config", lambda: {})
+    monkeypatch.setattr(gateway_run, "_load_gateway_config", dict)
     monkeypatch.setattr("gateway.stream_consumer.GatewayStreamConsumer", _StreamConsumer)
 
     import hermes_cli.tools_config as tools_config

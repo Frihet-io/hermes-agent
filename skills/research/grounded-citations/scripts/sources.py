@@ -388,7 +388,7 @@ def _sentences(prose: str) -> list[str]:
     out: list[str] = []
     for line in prose.splitlines():
         stripped = line.strip()
-        if not stripped or stripped.startswith("#") or stripped.startswith("|"):
+        if not stripped or stripped.startswith(("#", "|")):
             continue
         if stripped.startswith(">"):
             stripped = stripped.lstrip("> ").strip()

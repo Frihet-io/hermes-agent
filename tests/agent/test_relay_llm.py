@@ -1635,7 +1635,7 @@ def test_stream_managed_traps_direct_completed_response(relay_turn):
         session_id="session-1",
         name="test-provider",
         model_name="test-model",
-        finalizer=lambda: {},
+        finalizer=dict,
         completed_response_predicate=_choices_predicate,
     )
     stream._prime_completed_response()
@@ -1660,7 +1660,7 @@ def test_stream_current_inside_managed_callback_returns_raw(relay_turn):
             lambda inner_request: _completed_response(),
             name="moa-aggregator",
             model_name="test-model",
-            finalizer=lambda: {},
+            finalizer=dict,
             completed_response_predicate=_choices_predicate,
         )
 
@@ -1670,7 +1670,7 @@ def test_stream_current_inside_managed_callback_returns_raw(relay_turn):
         session_id="session-1",
         name="moa",
         model_name="test-model",
-        finalizer=lambda: {},
+        finalizer=dict,
         completed_response_predicate=_choices_predicate,
     )
     assert list(stream) == []

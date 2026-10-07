@@ -104,8 +104,8 @@ def test_build_child_agent_strips_kanban_toolset_even_when_parent_is_worker(monk
     import tools.delegate_tool_config as delegate_tool_config
 
     monkeypatch.setattr(run_agent, "AIAgent", FakeAgent)
-    monkeypatch.setattr(delegate_tool, "_load_config", lambda: {})
-    monkeypatch.setattr(delegate_tool_config, "_load_config", lambda: {})
+    monkeypatch.setattr(delegate_tool, "_load_config", dict)
+    monkeypatch.setattr(delegate_tool_config, "_load_config", dict)
 
     class Parent:
         enabled_toolsets = ["terminal", "kanban"]

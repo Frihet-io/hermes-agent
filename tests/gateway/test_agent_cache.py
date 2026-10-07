@@ -99,7 +99,7 @@ class TestAgentConfigSignature:
                 },
             },
         )
-        monkeypatch.setattr(runtime_provider, "_get_model_config", lambda: {})
+        monkeypatch.setattr(runtime_provider, "_get_model_config", dict)
 
         runtime = _resolve_runtime_agent_kwargs()
 

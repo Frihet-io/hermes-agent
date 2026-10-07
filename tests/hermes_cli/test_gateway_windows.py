@@ -693,7 +693,7 @@ def _arrange_uninstalled_start(monkeypatch):
     monkeypatch.delenv("HERMES_NONINTERACTIVE", raising=False)
     monkeypatch.setattr(gateway_windows, "_assert_windows", lambda: None)
     monkeypatch.setattr(gateway_windows, "_print_start_attestation_warning", lambda: None)
-    monkeypatch.setattr(gateway_windows, "_gateway_pids", lambda: [])
+    monkeypatch.setattr(gateway_windows, "_gateway_pids", list)
     monkeypatch.setattr(gateway_windows, "is_task_registered", lambda: False)
     monkeypatch.setattr(gateway_windows, "is_startup_entry_installed", lambda: False)
     monkeypatch.setattr(gateway_windows, "install", lambda **kwargs: installs.append(kwargs))

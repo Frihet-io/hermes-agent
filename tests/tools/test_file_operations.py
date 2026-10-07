@@ -586,7 +586,7 @@ class TestPatchReplacePostWriteVerification:
             if command.startswith("mkdir "):
                 return {"output": "", "returncode": 0}
             # wc -c for byte count after write
-            if command.startswith("if [ -f ") or command.startswith("wc -c"):
+            if command.startswith(("if [ -f ", "wc -c")):
                 for path in file_contents:
                     if path in command:
                         return {"output": str(len(file_contents[path].encode())), "returncode": 0}
@@ -623,7 +623,7 @@ class TestPatchReplacePostWriteVerification:
                 return {"output": "", "returncode": 1}
             if command.startswith("mkdir "):
                 return {"output": "", "returncode": 0}
-            if command.startswith("if [ -f ") or command.startswith("wc -c"):
+            if command.startswith(("if [ -f ", "wc -c")):
                 return {"output": str(len(state["content"].encode())), "returncode": 0}
             return {"output": "", "returncode": 0}
 

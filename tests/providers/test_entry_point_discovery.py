@@ -24,9 +24,7 @@ def _clear_provider_caches():
     providers._PROVIDER_LIST_CACHE = None
     providers._discovered = False
     for mod in list(sys.modules.keys()):
-        if mod.startswith("plugins.model_providers") or mod.startswith(
-            "_hermes_user_provider"
-        ):
+        if mod.startswith(("plugins.model_providers", "_hermes_user_provider")):
             del sys.modules[mod]
 
 

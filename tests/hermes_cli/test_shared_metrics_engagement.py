@@ -121,7 +121,7 @@ def test_a_late_interaction_never_reopens_a_closed_day():
 
 
 def test_collection_off_writes_no_engagement_state(direct_runtime, tmp_path, clock, monkeypatch):
-    monkeypatch.setattr("hermes_cli.config.read_raw_config_readonly", lambda: {})
+    monkeypatch.setattr("hermes_cli.config.read_raw_config_readonly", dict)
     _turn("s1", "t1", clock=clock, at=DAY1)
     clock["now"] = DAY1 + 86_400
     _turn("s1", "t2", clock=clock, at=DAY1 + 86_400)

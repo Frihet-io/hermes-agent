@@ -86,7 +86,7 @@ def _no_config(monkeypatch):
     """Isolate the guard from the machine's real config.yaml."""
     import hermes_cli.config as hermes_config
 
-    monkeypatch.setattr(hermes_config, "load_config", lambda: {})
+    monkeypatch.setattr(hermes_config, "load_config", dict)
 
 
 # ---------------------------------------------------------------------------

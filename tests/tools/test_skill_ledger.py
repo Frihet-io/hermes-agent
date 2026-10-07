@@ -602,7 +602,7 @@ def test_backup_fill_ignores_tar_path_traversal(ledger_env):
         "package fill did not restore the missing support file"
     )
     # Malicious members are not.
-    assert not any(p.endswith("evil.md") or p.endswith("outside.md") for p in paths)
+    assert not any(p.endswith(("evil.md", "outside.md")) for p in paths)
 
 import pytest
 

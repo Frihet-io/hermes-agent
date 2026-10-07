@@ -238,7 +238,7 @@ def test_every_primary_reply_counts_once_with_its_issue(direct_runtime, tmp_path
 
 
 def test_everything_is_a_no_op_while_disabled(direct_runtime, tmp_path, monkeypatch):
-    monkeypatch.setattr("hermes_cli.config.read_raw_config_readonly", lambda: {})
+    monkeypatch.setattr("hermes_cli.config.read_raw_config_readonly", dict)
     agent = _agent()
     harness.record_reply_finish(agent, object(), "length")
     _round(agent, ("terminal", True))
