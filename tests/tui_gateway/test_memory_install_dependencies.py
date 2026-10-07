@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 
-from tests.pm._fixtures import client, isolated_python, worker_toolchain, _wheel  # noqa: F401
+from tests.pm._fixtures import client as client, isolated_python as isolated_python, worker_toolchain, _wheel
 
 
 @pytest.mark.parametrize('enable', [False, True])
