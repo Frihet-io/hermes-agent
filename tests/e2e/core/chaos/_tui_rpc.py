@@ -16,7 +16,7 @@ import subprocess
 import threading
 import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Self
 
 from tests.e2e.core.chaos._helpers import REPO_ROOT, python_exe
 
@@ -198,7 +198,7 @@ class Heartbeat:
                 self._inflight_since = None
             self._stop.wait(self.interval)
 
-    def __enter__(self) -> "Heartbeat":
+    def __enter__(self) -> Self:
         self._inflight_since: float | None = None
         self._thread.start()
         return self

@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
+from typing import Self
 
 _CHUNK = 64 * 1024
 _FRAME = 8192  # sideband-1 payload per pkt-line that an unhurried upload-pack emits
@@ -198,7 +199,7 @@ class GitHTTPServer:
         self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
 
     # -- lifecycle -------------------------------------------------------------------------
-    def __enter__(self) -> GitHTTPServer:
+    def __enter__(self) -> Self:
         self._thread.start()
         return self
 

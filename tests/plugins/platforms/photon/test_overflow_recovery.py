@@ -20,7 +20,7 @@ No Node sidecar is spawned and no ports are bound.
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Dict
+from typing import Any, Dict, Self
 
 import pytest
 
@@ -503,10 +503,10 @@ async def test_standalone_send_classifies_target_not_allowed(
         def __init__(self, *a: Any, **k: Any) -> None:
             pass
 
-        async def __aenter__(self) -> "_FakeClient":
+        async def __aenter__(self) -> Self:
             return self
 
-        async def __aexit__(self, *a: Any) -> bool:
+        async def __aexit__(self, *a: object) -> bool:
             return False
 
         async def post(self, *a: Any, **k: Any) -> _Resp:

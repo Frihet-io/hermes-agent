@@ -30,7 +30,7 @@ import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Self
 
 from hermes_cli.observability.shared_metrics_consent import OFFER_VERSION
 
@@ -153,7 +153,7 @@ class FakeLLMServer:
         self._tool_seq = 0
 
     # lifecycle
-    def __enter__(self) -> "FakeLLMServer":
+    def __enter__(self) -> Self:
         self.start()
         return self
 

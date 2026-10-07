@@ -32,7 +32,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Self
 
 from openai.types.chat import ChatCompletionChunk
 from openai.types.chat.completion_create_params import CompletionCreateParamsStreaming
@@ -137,7 +137,7 @@ class FakeChatVariantServer:
         self._seq = 0
         self._server: ThreadingHTTPServer | None = None
 
-    def __enter__(self) -> "FakeChatVariantServer":
+    def __enter__(self) -> Self:
         self._server = ThreadingHTTPServer(("127.0.0.1", 0), _handler_for(self))
         self._server.daemon_threads = True
         threading.Thread(target=self._server.serve_forever, name="fake-chat-variant", daemon=True).start()

@@ -15,7 +15,7 @@ import threading
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Self
 
 from hermes_cli.cli_output import line_input
 from hermes_cli.plugin_install_phase import InstallPhase
@@ -62,7 +62,7 @@ class _ConsentRefusal(str):
     """A refusal reason (user-facing text) carrying its closed extension-install ``failure_class``,
     so publication classifies the refusal without matching the copy."""
 
-    def __new__(cls, text: str, failure_class: str) -> "_ConsentRefusal":
+    def __new__(cls, text: str, failure_class: str) -> Self:
         refusal = super().__new__(cls, text)
         refusal.failure_class = failure_class
         return refusal

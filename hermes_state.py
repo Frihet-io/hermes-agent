@@ -25,7 +25,7 @@ from contextlib import contextmanager, suppress
 from pathlib import Path
 
 from hermes_constants import get_hermes_home, mkdir_under_hermes_home
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, TypeVar, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, TypeVar, cast, Self
 
 from hermes_state_common import (
     TITLE_SOURCE_DERIVED as _TITLE_SOURCE_DERIVED, TITLE_SOURCE_LLM as _TITLE_SOURCE_LLM,
@@ -1488,7 +1488,7 @@ class SessionDB(
         except Exception as exc:
             logger.warning("WAL checkpoint (PASSIVE) failed: %s", exc)
 
-    def __enter__(self) -> "SessionDB":
+    def __enter__(self) -> Self:
         """``with SessionDB(path) as db:`` closes on exit; owners must release deterministically.
 
         Ownership of a SessionDB should be released explicitly. Historically an instance with a started

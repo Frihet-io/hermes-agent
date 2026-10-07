@@ -99,7 +99,7 @@ class SideloadBody(BaseModel):
     path: str                   # absolute path to a .gguf on this machine
 
 
-def _human_gb(n: int | float) -> str:
+def _human_gb(n: float) -> str:
     return f"{n / (1 << 30):.1f} GB"
 
 

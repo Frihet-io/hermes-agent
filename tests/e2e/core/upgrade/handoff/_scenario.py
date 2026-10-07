@@ -32,6 +32,7 @@ from tests.e2e.core._pending_fixes import known_failure, known_gate
 from tests.e2e.core.upgrade import _helpers as H
 from tests.e2e.core.upgrade.handoff import _handoff as X
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall
+from typing import Self
 
 CRON_DUE_S = 65  # after the update starts: the checkout holds the new code, the old gateway still ticks
 _TASK_RE = re.compile(r"work kanban task (t_[0-9a-f]+)")
@@ -251,7 +252,7 @@ class WorkerSampler:
                 logging.debug("Suppressed exception: %s", _exc, exc_info=True)
             self._stop.wait(self.interval)
 
-    def __enter__(self) -> "WorkerSampler":
+    def __enter__(self) -> Self:
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
         return self

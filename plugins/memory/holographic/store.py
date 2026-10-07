@@ -8,6 +8,7 @@ import threading
 from pathlib import Path
 
 from . import holographic as hrr
+from typing import Self
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS facts (
@@ -303,7 +304,7 @@ class MemoryStore:
                         MemoryStore._shared.pop(self._key, None)
             self._entry = None
 
-    def __enter__(self) -> "MemoryStore":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_: object) -> None:

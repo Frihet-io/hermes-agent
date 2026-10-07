@@ -35,7 +35,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Self
 from urllib.parse import unquote
 
 import botocore.session
@@ -302,7 +302,7 @@ class FakeBedrock:
     _ids: int = 0
     _httpd: ThreadingHTTPServer | None = None
 
-    def __enter__(self) -> "FakeBedrock":
+    def __enter__(self) -> Self:
         self._httpd = ThreadingHTTPServer(("127.0.0.1", 0), _handler_for(self))
         self._httpd.daemon_threads = True
         threading.Thread(target=self._httpd.serve_forever, daemon=True).start()

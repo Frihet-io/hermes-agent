@@ -313,7 +313,7 @@ class AnthropicMessagesServer:
         self._httpd: ThreadingHTTPServer | None = None
         self._tool_seq = 0
 
-    def __enter__(self) -> "AnthropicMessagesServer":
+    def __enter__(self) -> typing.Self:
         return self.start()
 
     def __exit__(self, *_exc: object) -> None:

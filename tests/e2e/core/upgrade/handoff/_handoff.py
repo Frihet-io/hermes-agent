@@ -38,6 +38,7 @@ import hermes_yaml as yaml
 from tests.e2e.core.upgrade import _helpers as H
 from tests.e2e.core.upgrade import _install_helpers as I
 from tests.e2e.core.upgrade.handoff._nshost import NamespaceHost
+from typing import Self
 
 TRACEBACK = I.TRACEBACK
 UPDATE_TIMEOUT = 1500
@@ -492,7 +493,7 @@ class FileWatch:
                 last = cur
             self._stop.wait(self.interval)
 
-    def __enter__(self) -> "FileWatch":
+    def __enter__(self) -> Self:
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
         return self

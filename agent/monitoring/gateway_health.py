@@ -179,7 +179,7 @@ def build_gateway_health_snapshot(
         "hermes.supervision_mode": mode if mode in _SUPERVISION_MODES else "unknown",
     }
 
-    def metric(name: str, value: int | float, **extra: str) -> GatewayMetric:
+    def metric(name: str, value: float, **extra: str) -> GatewayMetric:
         attrs = dict(base)
         for key, val in extra.items():
             if val is not None:

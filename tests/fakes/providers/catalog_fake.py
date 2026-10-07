@@ -32,7 +32,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any
+from typing import Any, Self
 
 USAGE_IN = 1234
 USAGE_OUT = 56
@@ -85,7 +85,7 @@ class CatalogFake:
         self._stop = threading.Event()
         self._server: ThreadingHTTPServer | None = None
 
-    def __enter__(self) -> "CatalogFake":
+    def __enter__(self) -> Self:
         server = ThreadingHTTPServer(("127.0.0.1", 0), _handler_for(self))
         server.daemon_threads = True
         self._server = server

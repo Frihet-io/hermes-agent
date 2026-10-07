@@ -38,7 +38,7 @@ import urllib.parse
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Self
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -389,7 +389,7 @@ class FakeVertex:
         self._tls: ssl.SSLContext | None = None
 
     # lifecycle
-    def __enter__(self) -> "FakeVertex":
+    def __enter__(self) -> Self:
         self.start()
         return self
 

@@ -18,7 +18,7 @@ import json
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Self
 
 from aiohttp import web
 
@@ -140,7 +140,7 @@ class StandinServer:
     async def on_shutdown(self) -> None:
         """Subclasses close long-lived sockets here."""
 
-    def __enter__(self) -> "StandinServer":
+    def __enter__(self) -> Self:
         return self.start()
 
     def __exit__(self, *_exc: object) -> None:

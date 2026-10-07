@@ -10,7 +10,7 @@ import unittest
 from collections import OrderedDict
 from pathlib import Path
 from types import SimpleNamespace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -1137,7 +1137,7 @@ class TestAdapterBehavior(unittest.TestCase):
             def __init__(self, *_a: object, **_k: object) -> None:
                 pass
 
-            async def __aenter__(self) -> "_FakeAsyncClient":
+            async def __aenter__(self) -> Self:
                 events.append("client_enter")
                 return self
 

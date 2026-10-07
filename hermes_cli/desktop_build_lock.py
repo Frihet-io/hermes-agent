@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 from pathlib import Path
-from typing import IO
+from typing import IO, Self
 
 
 class DesktopBuildLock:
@@ -147,7 +147,7 @@ class DesktopBuildLock:
             finally:
                 self._release_checkout()  # the narrower lock first: the order is checkout, build
 
-    def __enter__(self) -> "DesktopBuildLock":
+    def __enter__(self) -> Self:
         if not self.acquire():
             raise RuntimeError("desktop build lock is already held")
         return self

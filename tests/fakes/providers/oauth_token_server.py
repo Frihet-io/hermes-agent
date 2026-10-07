@@ -41,7 +41,7 @@ import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Self
 from urllib.parse import parse_qs
 
 DEVICE_CODE_GRANT = "urn:ietf:params:oauth:grant-type:device_code"
@@ -234,7 +234,7 @@ class OAuthTokenServer:
     def handler_class(self) -> type[BaseHTTPRequestHandler]:
         return _make_handler(self)
 
-    def __enter__(self) -> "OAuthTokenServer":
+    def __enter__(self) -> Self:
         return self.start()
 
     def __exit__(self, *exc: object) -> None:
@@ -416,7 +416,7 @@ class TLSInterceptProxy:
             except OSError:
                 pass
 
-    def __enter__(self) -> "TLSInterceptProxy":
+    def __enter__(self) -> Self:
         return self.start()
 
     def __exit__(self, *exc: object) -> None:

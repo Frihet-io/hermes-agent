@@ -36,7 +36,7 @@ import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Self
 from urllib.parse import parse_qs, urlsplit
 
 GEMINI_HOST = "generativelanguage.googleapis.com"
@@ -458,11 +458,11 @@ class GeminiFake:
         self._thread = threading.Thread(target=self._server.serve_forever, name="gemini-fake", daemon=True)
 
     # lifecycle ---------------------------------------------------------------------------------
-    def __enter__(self) -> "GeminiFake":
+    def __enter__(self) -> Self:
         self._thread.start()
         return self
 
-    def __exit__(self, *exc: Any) -> None:
+    def __exit__(self, *exc: object) -> None:
         self._server.shutdown()
         self._server.server_close()
         self._thread.join(timeout=10)

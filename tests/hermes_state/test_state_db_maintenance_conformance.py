@@ -40,6 +40,7 @@ from hermes_cli.backup import (
     create_quick_snapshot,
     verify_sqlite_integrity,
 )
+from typing import Self
 
 # ---------------------------------------------------------------------------
 # Fixtures — real WAL-mode SessionDB in tmp dirs
@@ -113,7 +114,7 @@ class _LiveWriter:
             if conn is not None:
                 conn.close()
 
-    def __enter__(self) -> "_LiveWriter":
+    def __enter__(self) -> Self:
         self.thread.start()
         assert self.ready.wait(timeout=30), "live writer never acquired lock"
         if self.error is not None:

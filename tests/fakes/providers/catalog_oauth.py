@@ -27,7 +27,7 @@ import time
 import urllib.parse
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any
+from typing import Any, Self
 
 NOUS_INVOKE_SCOPE = "inference:invoke"
 
@@ -73,7 +73,7 @@ class OAuthFake:
         self._lock = threading.Lock()
         self._server: ThreadingHTTPServer | None = None
 
-    def __enter__(self) -> "OAuthFake":
+    def __enter__(self) -> Self:
         server = ThreadingHTTPServer(("127.0.0.1", 0), _handler_for(self))
         server.daemon_threads = True
         self._server = server

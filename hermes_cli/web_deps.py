@@ -84,10 +84,10 @@ class LateState:
     def __exit__(self, *exc):
         return self._target().__exit__(*exc)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self._target() == other
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return self._target() != other
 
     def __lt__(self, other: Any) -> bool:

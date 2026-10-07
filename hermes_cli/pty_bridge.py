@@ -20,7 +20,7 @@ import struct
 import sys
 import termios  # windows-footgun: ok — POSIX-only module by design (see docstring)
 import time
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Self
 
 try:
     import ptyprocess  # type: ignore
@@ -375,7 +375,7 @@ class PtyBridge:
         except Exception as _exc:
             logging.debug("Suppressed exception: %s", _exc, exc_info=True)
 
-    def __enter__(self) -> "PtyBridge":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_exc) -> None:

@@ -30,7 +30,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Self
 
 from openai.types.responses import (
     Response,
@@ -299,7 +299,7 @@ class FakeResponsesServer:
         self._lock = threading.Lock()
         self._server: ThreadingHTTPServer | None = None
 
-    def __enter__(self) -> "FakeResponsesServer":
+    def __enter__(self) -> Self:
         server = ThreadingHTTPServer(("127.0.0.1", 0), _handler_for(self))
         server.daemon_threads = True
         self._server = server

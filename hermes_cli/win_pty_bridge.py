@@ -6,7 +6,7 @@ import asyncio
 import logging
 import sys
 import time
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Self
 
 try:
     from winpty import PtyProcess  # type: ignore
@@ -187,7 +187,7 @@ class WinPtyBridge:
         except Exception as _exc:
             logging.debug("Suppressed exception: %s", _exc, exc_info=True)
 
-    def __enter__(self) -> "WinPtyBridge":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_exc) -> None:

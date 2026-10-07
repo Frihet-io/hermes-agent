@@ -35,6 +35,7 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
 from stat import S_ISREG
+from typing import Self
 
 logger = logging.getLogger(__name__)
 
@@ -1568,7 +1569,7 @@ class UpdateLock:
             self.acquired = self._claimed = False
             self._drop_checkout()
 
-    def __enter__(self) -> "UpdateLock":
+    def __enter__(self) -> Self:
         self.acquire()
         return self
 

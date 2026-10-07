@@ -666,7 +666,7 @@ class ToolRegistry:
     def register(
         self, name: str, toolset: str, schema: dict, handler: Callable,
         check_fn: Callable = None, requires_env: list = None, is_async: bool = False,
-        description: str = "", emoji: str = "", max_result_size_chars: int | float | None = None,
+        description: str = "", emoji: str = "", max_result_size_chars: float | None = None,
         dynamic_schema_overrides: Callable = None, override: bool = False,
         scope: Optional[str] = None):
         """Register a tool (called at import time by each tool file). ``override=True`` is an
@@ -925,7 +925,7 @@ class ToolRegistry:
     def _attr(self, name: str, attr: str):
         return getattr(self.get_entry(name), attr, None)
 
-    def get_max_result_size(self, name: str, default: int | float | None = None) -> int | float:
+    def get_max_result_size(self, name: str, default: float | None = None) -> int | float:
         """Return per-tool max result size, or *default* (or global default)."""
         size = self._attr(name, "max_result_size_chars")
         if size is not None:
