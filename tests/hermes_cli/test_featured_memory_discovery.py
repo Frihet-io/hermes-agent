@@ -37,19 +37,15 @@ def test_picker_offers_missing_provider_without_mutating_until_install(catalog, 
     def install(name, **kwargs):
         installs.append((name, kwargs))
         assert config.load_config()["memory"]["provider"] == "previous"
-        assert kwargs == {"enable": False}
+        assert kwargs == {"enable": True, "select_memory": False}
         target = memory_setup.get_hermes_home() / "plugins" / name
         target.mkdir(parents=True)
         (target / "plugin.yaml").write_text(f"name: {name}\n")
-
-    def admit(name, *, enable, console):
-        assert enable
-        assert config.load_config()["memory"]["provider"] == "previous"
-        config.save_config({"plugins": {"enabled": [name]}})
+        # The installer's own admission lists it as enabled; selection stays put.
+        config.save_config({**config.load_config(), "plugins": {"enabled": [name]}})
         loaded.append((name, "no setup needed", Provider()))
 
     monkeypatch.setattr(plugins_cmd, "cmd_install", install)
-    monkeypatch.setattr(plugins_cmd, "_set_plugin_enabled", admit)
     monkeypatch.setattr(memory_setup, "_install_dependencies", lambda name: deps.append(name))
     screens = []
 
@@ -71,7 +67,7 @@ def test_picker_offers_missing_provider_without_mutating_until_install(catalog, 
     assert screens
     assert deps == []
     if choice == "schema-less":
-        assert installs == [("featured-provider", {"enable": False})]
+        assert installs == [("featured-provider", {"enable": True, "select_memory": False})]
         assert config.load_config()["memory"]["provider"] == "featured-provider"
     else:
         assert installs == []
