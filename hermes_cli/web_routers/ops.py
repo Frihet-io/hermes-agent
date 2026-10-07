@@ -502,7 +502,8 @@ async def get_memory_status(profile: Optional[str] = None):
         from hermes_cli.memory_catalog import featured_memory_entries
 
         providers = _discover_memory_provider_statuses()
-        featured = {entry.name: entry for entry in featured_memory_entries()}
+        # Request path: cached + in-tree catalog only, never a live fetch.
+        featured = {entry.name: entry for entry in featured_memory_entries(network=False)}
         # Configured-but-missing rows are not installation evidence.
         discovered = {row["name"] for row in providers if row["status"] != "missing"}
         providers = [{**row, "featured": row["name"] in discovered and row["name"] in featured}

@@ -35,7 +35,7 @@ def register(ctx): ctx.register_memory_provider(Provider())
         (plugin / 'config_schema.py').write_text('''from plugins.memory.config_schema import ProviderConfigSchema, ProviderField
 CONFIG_SCHEMA = ProviderConfigSchema(name="save-fixture", label="Fixture", fields=(ProviderField(key="workspace", label="Workspace"),))
 ''')
-    monkeypatch.setattr('hermes_cli.memory_catalog.featured_memory_entries', lambda: [])
+    monkeypatch.setattr('hermes_cli.memory_catalog.featured_memory_entries', lambda **kw: [])
     client = TestClient(app, headers={_SESSION_HEADER_NAME: _SESSION_TOKEN})
     old = secret_scope.is_multiplex_active()
     secret_scope.set_multiplex_active(True)

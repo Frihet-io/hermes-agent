@@ -467,11 +467,12 @@ def _prefer_in_tree_entry(tree: PluginCatalogEntry, live: PluginCatalogEntry, tr
     return False
 
 
-def load_catalog_live() -> List[PluginCatalogEntry]:
+def load_catalog_live(*, network: bool = True) -> List[PluginCatalogEntry]:
     """Entries from the live (or cached) catalog, else the in-tree catalog. When both name an entry at
     different pins the NEWER source supplies it — right after ``hermes update`` bumps an in-tree pin,
-    a cache fetched before the bump must not re-install the old one (see :func:`_prefer_in_tree_entry`)."""
-    data = fetch_live_catalog()
+    a cache fetched before the bump must not re-install the old one (see :func:`_prefer_in_tree_entry`).
+    ``network=False`` reads only the last fetched copy, for request paths that must never block."""
+    data = fetch_live_catalog() if network else _stale_live_cache(_live_cache_path())
     if data is None:
         return load_catalog()
     entries = [e for i, raw in enumerate(data["entries"])

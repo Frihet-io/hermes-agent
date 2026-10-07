@@ -130,8 +130,30 @@ def test_http_featured_discovery_alternates_homes_and_retains_missing(catalog, t
         else:
             assert row["status"] != "missing" and row["featured"] is True
             assert data["catalog_providers"] == []
-    monkeypatch.setattr(plugin_catalog, "load_catalog_live", lambda: (_ for _ in ()).throw(OSError("offline")))
+    monkeypatch.setattr(plugin_catalog, "load_catalog_live", lambda **kw: (_ for _ in ()).throw(OSError("offline")))
     data = client.get("/api/memory", params={"profile": "default"}).json()
     assert data["providers"][0]["featured"] is False
     assert data["catalog_providers"] == []
     assert all((p / "config.yaml").read_bytes() == raw for p, raw in before.items())
+
+
+def test_http_discovery_reads_the_cached_catalog_without_a_live_fetch(monkeypatch):
+    """GET /api/memory is polled by Settings and Command Center: an expired cache or a dead
+    catalog host must not cost the request a network timeout."""
+    import httpx
+    from starlette.testclient import TestClient
+    from hermes_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
+
+    cached = _entry(name="cached-provider", featured=True)
+    monkeypatch.setattr(plugin_catalog, "load_catalog", lambda *a: [])
+    monkeypatch.setattr(plugin_catalog, "load_removed_list", lambda *a: [])
+    monkeypatch.setattr(plugin_catalog, "_stale_live_cache", lambda path: {"entries": [cached.to_dict()]})
+
+    def no_network(*args, **kwargs):
+        raise AssertionError("GET /api/memory reached the network")
+
+    monkeypatch.setattr(httpx, "get", no_network)
+    monkeypatch.setattr(plugin_catalog, "fetch_live_catalog", no_network)
+    response = TestClient(app, headers={_SESSION_HEADER_NAME: _SESSION_TOKEN}).get("/api/memory")
+    assert response.status_code == 200, response.text
+    assert [row["name"] for row in response.json()["catalog_providers"]] == ["cached-provider"]
