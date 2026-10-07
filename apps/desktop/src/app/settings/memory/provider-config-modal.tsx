@@ -113,7 +113,11 @@ export function ProviderConfigModal({
   }
 
   if (!policy.allowed) {
-    return open ? <p role="status">{t.memoryDiscovery.configureElsewhere}</p> : null
+    return open ? (
+      <p className="py-2 text-[length:var(--conversation-caption-font-size)] text-(--ui-text-tertiary)" role="status">
+        {t.memoryDiscovery.configureElsewhere}
+      </p>
+    ) : null
   }
 
   return (

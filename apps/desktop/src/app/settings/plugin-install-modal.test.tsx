@@ -164,7 +164,7 @@ describe('Memory catalog ownership', () => {
     await act(() => requestPluginCatalogInstallFromDeepLink('memory'))
     expect(await screen.findByText('This package includes')).toBeTruthy()
     // The actual SettingsPage must consume the route, not silently fall back to Model.
-    expect(await screen.findByRole('combobox', { name: 'Provider settings', hidden: true })).toBeTruthy()
+    expect(await screen.findByRole('combobox', { name: 'Memory Provider', hidden: true })).toBeTruthy()
     expect(screen.getByTestId('location').textContent).toBe('/settings?tab=config:memory&page=persistent')
     expect($settingsScopeProfile.get()).toBe('default')
     expect(screen.getByRole('dialog')).toBeTruthy()
@@ -186,7 +186,7 @@ describe('Memory catalog ownership', () => {
     )
     expect(installDesktopPlugin).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Back to Memory settings' }))
-    expect(await screen.findByRole('combobox', { name: 'Provider settings' })).toBeTruthy()
+    expect(await screen.findByRole('combobox', { name: 'Memory Provider' })).toBeTruthy()
     expect(screen.getByTestId('location').textContent).toBe('/settings?tab=config:memory&page=persistent')
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(api.mock.calls.every(([request]) => !request.method || request.method === 'GET')).toBe(true)

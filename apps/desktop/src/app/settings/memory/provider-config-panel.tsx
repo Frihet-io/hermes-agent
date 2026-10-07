@@ -104,7 +104,11 @@ export function ProviderConfigPanel({
   )
 
   if (config && !providerConfigSavePolicy(config, isActive).allowed) {
-    return <p role="status">{t.memoryDiscovery.configureElsewhere}</p>
+    return (
+      <p className="py-2 text-[length:var(--conversation-caption-font-size)] text-(--ui-text-tertiary)" role="status">
+        {t.memoryDiscovery.configureElsewhere}
+      </p>
+    )
   }
 
   // Providers without a declared config surface (e.g. builtin) render nothing.

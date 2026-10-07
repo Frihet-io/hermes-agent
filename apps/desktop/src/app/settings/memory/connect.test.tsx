@@ -99,7 +99,7 @@ describe('MemoryConnect', () => {
       })
       expect(getStatus).toHaveBeenCalledTimes(probes)
       expect(onConnected).not.toHaveBeenCalled()
-      expect(screen.queryByText('oauth set')).toBeNull()
+      expect(screen.queryByText('OAuth connected')).toBeNull()
     })
   })
 })

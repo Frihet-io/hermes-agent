@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ResolvedOwner } from '@/api/client'
 import { Button } from '@/components/ui/button'
 import { getMemoryProviderOAuthStatus, startMemoryProviderOAuth } from '@/hermes'
+import { useI18n } from '@/i18n'
 import { Check, ExternalLink, Loader2 } from '@/lib/icons'
 import { notifyError } from '@/store/notifications'
 import type { MemoryProviderOAuthStatus } from '@/types/hermes'
@@ -24,6 +25,8 @@ export function MemoryConnect({
   provider: string
   owner?: ResolvedOwner
 }) {
+  const { t } = useI18n()
+  const c = t.memoryDiscovery
   const [capable, setCapable] = useState<'no' | 'unknown' | 'yes'>('unknown')
   const [connected, setConnected] = useState(false)
   const [auth, setAuth] = useState<MemoryProviderOAuthStatus['auth']>(null)
@@ -105,7 +108,7 @@ export function MemoryConnect({
     deadline.current = setTimeout(() => {
       stop()
       setPhase('error')
-      setDetail('Stopped waiting — authorization may still be pending.')
+      setDetail(c.stoppedWaiting)
     }, POLL_TIMEOUT_MS)
 
     try {
@@ -117,8 +120,8 @@ export function MemoryConnect({
 
       stop()
       setPhase('error')
-      setDetail('Could not start the connection.')
-      notifyError(err, 'Failed to start connection')
+      setDetail(c.startFailed)
+      notifyError(err, c.startFailed)
 
       return
     }
@@ -158,7 +161,7 @@ export function MemoryConnect({
 
       if (next.state === 'error') {
         setPhase('error')
-        setDetail(next.detail || 'Connection failed.')
+        setDetail(next.detail || c.connectionFailed)
       } else {
         setPhase('idle')
 
@@ -167,7 +170,7 @@ export function MemoryConnect({
             await onConnected?.()
           } catch (err) {
             if (completed === generation.current) {
-              notifyError(err, 'Failed to refresh memory provider status')
+              notifyError(err, c.loadFailed)
             }
           }
         }
@@ -175,7 +178,7 @@ export function MemoryConnect({
     }
 
     timer.current = setTimeout(() => void poll(), POLL_MS)
-  }, [profile, provider, stop, owner, onConnected])
+  }, [c, profile, provider, stop, owner, onConnected])
 
   const cancel = useCallback(() => {
     stop()
@@ -186,34 +189,28 @@ export function MemoryConnect({
     return null
   }
 
-  const connectLabel = connected ? (auth === 'apikey' ? 'Connect via OAuth' : 'Reconnect') : 'Connect'
+  const connectLabel = connected ? (auth === 'apikey' ? c.connectOAuth : c.reconnect) : c.connect
 
   return (
-    <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+    <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-[length:var(--conversation-caption-font-size)]">
       {phase === 'idle' && connected && (
-        <span className="inline-flex items-center gap-1 text-muted-foreground">
+        <span className="inline-flex items-center gap-1 text-(--ui-text-tertiary)">
           <Check className="size-3" />
-          {auth === 'apikey' ? 'api key set' : 'oauth set'}
+          {auth === 'apikey' ? c.apiKeySet : c.oauthSet}
         </span>
       )}
       {phase === 'pending' ? (
         <>
-          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 text-(--ui-text-tertiary)">
             <Loader2 className="size-3 animate-spin" />
-            Waiting for browser consent…
+            {c.waitingConsent}
           </span>
-          <Button className="h-auto p-0 text-xs" onClick={cancel} size="sm" type="button" variant="link">
-            Stop waiting
+          <Button onClick={cancel} size="inline" type="button" variant="text">
+            {c.stopWaiting}
           </Button>
         </>
       ) : (
-        <Button
-          className="h-auto gap-1 p-0 text-xs"
-          onClick={() => void connect()}
-          size="sm"
-          type="button"
-          variant="link"
-        >
+        <Button className="gap-1" onClick={() => void connect()} size="inline" type="button" variant="text">
           <ExternalLink className="size-3" />
           {connectLabel}
         </Button>

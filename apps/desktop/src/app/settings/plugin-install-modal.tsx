@@ -3,8 +3,6 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } fro
 import { useLocation, useNavigate } from 'react-router'
 
 import { $apiRequestScope } from '@/api/client'
-import { getMemoryStatus } from '@/api/system'
-import { memoryDiscoveryKey } from '@/api/system'
 import { useGatewayRequest } from '@/app/gateway/hooks/use-gateway-request'
 import { NEW_CHAT_ROUTE, SETTINGS_ROUTE } from '@/app/routes'
 import { Button } from '@/components/ui/button'
@@ -23,12 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { discoverRuntimePlugins } from '@/contrib/runtime-loader'
 import { useI18n } from '@/i18n'
-import { ExternalLink } from '@/lib/external-link'
-import { AlertTriangle } from '@/lib/icons'
 import { resolvePluginSourceLinks } from '@/lib/plugin-source-urls'
-import { queryClient } from '@/lib/query-client'
 import { type AgentPluginLiveNow, COMMIT_SHA_RE, installAgentPlugin, loadAgentPlugins } from '@/store/agent-plugins'
-import { activeGateway } from '@/store/gateway'
 import { notify } from '@/store/notifications'
 import {
   $pluginInstallRequest,
@@ -39,6 +33,10 @@ import {
 import { $activeGatewayProfile, $profiles, $profileScope, normalizeProfileKey, profileLabel } from '@/store/profile'
 import { $connection } from '@/store/session'
 import { setSettingsScope } from '@/store/settings-scope'
+
+import { installMemoryProvider, memoryOwnerIsForeground } from './memory/memory-install'
+import { MemoryInstallConsent, MemoryInstallStatus } from './memory/memory-install-status'
+import { PluginSourceReview, ProbeWarnings } from './plugin-install-review'
 
 type ProbeResult = Awaited<ReturnType<NonNullable<NonNullable<Window['hermesDesktop']>['probePluginRepo']>>>
 
@@ -189,13 +187,9 @@ export function PluginInstallModal() {
 
     if (request.memory) {
       const { owner } = request.memory
-      const foreground = $apiRequestScope.get()
 
       // A slow catalog lookup must not take over a newly selected owner.
-      if (
-        foreground.connectionId === owner.connectionId &&
-        normalizeProfileKey(foreground.profile) === normalizeProfileKey(owner.profile)
-      ) {
+      if (memoryOwnerIsForeground(owner)) {
         openMemorySettings(normalizeProfileKey(owner.profile))
       }
     }
@@ -240,8 +234,60 @@ export function PluginInstallModal() {
     closePluginInstallRequest()
   }
 
+  const installMemory = async (memory: NonNullable<PluginInstallRequest['memory']>, repo: string) => {
+    installPending.current = true
+    setInstalling(true)
+    setInstallError(null)
+    setInstallUncertain(false)
+
+    try {
+      const outcome = await installMemoryProvider({
+        catalogName: request?.catalogName,
+        name: memory.name,
+        owner: memory.owner,
+        ref: pinRefTrimmed || undefined,
+        repo
+      })
+
+      if ($pluginInstallRequest.get() !== request) {
+        return
+      }
+
+      if (outcome === 'owner-changed') {
+        setInstallError(t.memoryDiscovery.ownerChanged)
+      } else if (outcome === 'timed-out') {
+        setInstallUncertain(true)
+      } else if (typeof outcome === 'object') {
+        setInstallError(outcome.error || m.agentFailed)
+      } else {
+        setMemoryResult(outcome)
+      }
+    } finally {
+      installPending.current = false
+      setInstalling(false)
+    }
+  }
+
+  const installBlocked = () =>
+    !request || !probe?.ok || installPending.current || installing || installUncertain || Boolean(memoryResult)
+
+  // Memory-discovery installs take their own, owner-pinned path; everything else is the generic flow.
+  const startInstall = () => {
+    if (installBlocked()) {
+      return
+    }
+
+    if (!request?.memory) {
+      void handleInstall()
+    } else if (probe?.agent) {
+      void installMemory(request.memory, request.repo)
+    } else {
+      setInstallError(m.selectComponent)
+    }
+  }
+
   const handleInstall = async () => {
-    if (!request || !probe?.ok || installPending.current || installing || installUncertain || memoryResult) {
+    if (!request || !probe?.ok) {
       return
     }
 
@@ -251,30 +297,6 @@ export function PluginInstallModal() {
       return
     }
 
-    const memory = request.memory
-
-    if (memory && !probe.agent) {
-      setInstallError(m.selectComponent)
-
-      return
-    }
-
-    const gateway = activeGateway()
-
-    const ownerMatches =
-      !memory ||
-      ($apiRequestScope.get().connectionId === memory.owner.connectionId &&
-        normalizeProfileKey($apiRequestScope.get().profile) === normalizeProfileKey(memory.owner.profile))
-
-    if (memory && (!ownerMatches || !gateway)) {
-      setInstallError(t.memoryDiscovery.ownerChanged)
-
-      return
-    }
-
-    // Pin the socket before the first await. Never reconnect/retry a mutation
-    // through the ambient requestGateway, which can change owners mid-install.
-    const installRequest = memory && gateway ? gateway.request.bind(gateway) : requestGateway
     installPending.current = true
     setInstalling(true)
     setInstallError(null)
@@ -287,39 +309,14 @@ export function PluginInstallModal() {
 
     try {
       if (installAgent && probe.agent) {
-        const result = await installAgentPlugin(installRequest, {
+        const result = await installAgentPlugin(requestGateway, {
           identifier: request.repo,
           force: forceReinstall,
-          enable: memory ? true : enableAgent,
+          enable: enableAgent,
           catalogName: request.catalogName,
           ref: pinRefTrimmed || undefined,
-          profile: memory ? memory.owner.profile : targetProfile
+          profile: targetProfile
         })
-
-        if (memory && result.ok) {
-          try {
-            const status = await getMemoryStatus(memory.owner)
-            queryClient.setQueryData(memoryDiscoveryKey(memory.owner), status)
-
-            if ($pluginInstallRequest.get() === request) {
-              setMemoryResult(
-                status.providers.some(provider => provider.name === memory.name && provider.status !== 'missing')
-                  ? 'discovered'
-                  : 'missing'
-              )
-            }
-          } catch {
-            if ($pluginInstallRequest.get() === request) {
-              setMemoryResult('missing')
-            }
-          }
-
-          return
-        }
-
-        if (memory && $pluginInstallRequest.get() !== request) {
-          return
-        }
 
         if (result.ok) {
           successes.push(
@@ -355,10 +352,7 @@ export function PluginInstallModal() {
           // installing. A read-only list refresh can show an already landed
           // package; the user can rescan later if the backend is still busy.
           setInstallUncertain(true)
-
-          if (!memory) {
-            void loadAgentPlugins(requestGateway, targetProfile)
-          }
+          void loadAgentPlugins(requestGateway, targetProfile)
 
           return
         } else {
@@ -366,7 +360,7 @@ export function PluginInstallModal() {
         }
       }
 
-      if (!memory && installDesktop && probe.desktop) {
+      if (installDesktop && probe.desktop) {
         if (desktopHalfFromPackage) {
           // Unified package into a LOCAL backend: the desktop half ships inside
           // the package folder. Materialise it from there (one source of truth,
@@ -404,9 +398,7 @@ export function PluginInstallModal() {
         }
       }
 
-      if (!memory) {
-        await loadAgentPlugins(requestGateway, targetProfile)
-      }
+      await loadAgentPlugins(requestGateway, targetProfile)
 
       if (errors.length === 0) {
         for (const message of successes) {
@@ -442,11 +434,7 @@ export function PluginInstallModal() {
   }
 
   const open = request !== null && (!onSettings || Boolean(request.memory))
-
-  const memoryOwnerMatches =
-    !request?.memory ||
-    (requestScope.connectionId === request.memory.owner.connectionId &&
-      normalizeProfileKey(requestScope.profile) === normalizeProfileKey(request.memory.owner.profile))
+  const memoryOwnerMatches = !request?.memory || memoryOwnerIsForeground(request.memory.owner, requestScope)
 
   const busy = phase === 'probing' || installing
   const pinRefTrimmed = pinRef.trim().toLowerCase()
@@ -495,49 +483,7 @@ export function PluginInstallModal() {
 
         {request?.repo && (
           <div className="space-y-4">
-            <div>
-              <div className="mb-1 text-[length:var(--conversation-caption-font-size)] font-medium text-foreground">
-                {m.repoLabel}
-              </div>
-              <div className="rounded-lg border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-3 py-2 font-mono text-[length:var(--conversation-caption-font-size)] break-all text-foreground">
-                {request.repo}
-              </div>
-              {request.catalogName && (
-                <p className="mt-1 text-[length:var(--conversation-caption-font-size)] text-(--ui-text-tertiary)">
-                  {m.catalogPinned(request.catalogName, request.sha?.slice(0, 8) ?? '')}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-3 rounded-lg border border-(--ui-stroke-tertiary) bg-(--ui-bg-quinary) px-3 py-2.5">
-              <div className="space-y-2 text-[length:var(--conversation-caption-font-size)]">
-                <div className="font-medium text-foreground">
-                  {request.catalogName ? m.reviewedHeading : m.securityHeading}
-                </div>
-                <p className="text-(--ui-text-secondary)">{request.catalogName ? m.reviewedIntro : m.securityIntro}</p>
-              </div>
-
-              {sourceLinks && (
-                <div className="space-y-2 border-t border-(--ui-stroke-tertiary) pt-3">
-                  <div className="font-medium text-foreground">{m.sourceHeading}</div>
-                  {sourceLinks.browseUrl && (
-                    <ExternalLink
-                      className="text-[length:var(--conversation-caption-font-size)]"
-                      href={sourceLinks.browseUrl}
-                      showExternalIcon
-                    >
-                      {sourceLinks.subdir ? m.viewPluginFiles : m.viewRepository}
-                    </ExternalLink>
-                  )}
-                  <div>
-                    <div className="mb-1 text-(--ui-text-tertiary)">{m.gitCloneLabel}</div>
-                    <div className="rounded-md border border-(--ui-stroke-tertiary) bg-(--ui-bg-primary) px-2.5 py-1.5 font-mono break-all text-foreground">
-                      {sourceLinks.gitUrl}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <PluginSourceReview request={request} sourceLinks={sourceLinks} />
 
             {phase === 'probing' && (
               <p className="text-[length:var(--conversation-caption-font-size)] text-(--ui-text-tertiary)">
@@ -620,21 +566,9 @@ export function PluginInstallModal() {
                   </p>
                 )}
 
-                {(probe.insecure || (probe.warnings?.length ?? 0) > 0) && (
-                  <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[length:var(--conversation-caption-font-size)] text-foreground">
-                    <AlertTriangle
-                      aria-hidden
-                      className="mt-0.5 size-3.5 shrink-0 text-amber-600 dark:text-amber-400"
-                    />
-                    <span>
-                      {[...new Set([...(probe.warnings ?? []), probe.insecure ? m.insecureWarning : ''])]
-                        .filter(Boolean)
-                        .join(' ')}
-                    </span>
-                  </div>
-                )}
+                <ProbeWarnings insecure={probe.insecure} warnings={probe.warnings} />
 
-                {request.memory && <p className="text-sm text-muted-foreground">{t.memoryDiscovery.installConsent}</p>}
+                {request.memory && <MemoryInstallConsent />}
                 {probe.agent && !request.memory && (
                   <label className="flex items-center justify-between gap-3">
                     <span className="text-[length:var(--conversation-caption-font-size)] text-foreground">
@@ -677,12 +611,9 @@ export function PluginInstallModal() {
               </div>
             )}
 
-            {memoryResult && (
-              <p role="status">
-                {memoryResult === 'discovered' ? t.memoryDiscovery.installedNotice : t.memoryDiscovery.notDiscovered}
-              </p>
+            {request.memory && (
+              <MemoryInstallStatus ownerMatches={memoryOwnerMatches || Boolean(installError)} result={memoryResult} />
             )}
-            {!memoryOwnerMatches && !installError && <p role="status">{t.memoryDiscovery.ownerChanged}</p>}
             {installError && (
               <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 whitespace-pre-wrap text-[length:var(--conversation-caption-font-size)] text-destructive">
                 {installError}
@@ -721,7 +652,7 @@ export function PluginInstallModal() {
               disabled={
                 busy || Boolean(memoryResult) || installUncertain || phase !== 'ready' || !probe?.ok || pinRefInvalid
               }
-              onClick={() => void handleInstall()}
+              onClick={startInstall}
             >
               {installing ? m.installing : m.install}
             </Button>
