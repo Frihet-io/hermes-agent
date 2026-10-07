@@ -34,7 +34,7 @@ function renderSelection(
 }
 
 async function inspectProvider(name: string) {
-  fireEvent.click(await screen.findByRole('combobox', { name: 'Provider settings' }))
+  fireEvent.click(await screen.findByRole('combobox', { name: 'Memory Provider' }))
   fireEvent.click(await screen.findByRole('option', { name }))
 }
 
@@ -93,8 +93,10 @@ it('configures and connects an inactive provider before explicit Use, with owner
   })
 
   renderSelection({ api }, { connectionId: 'a', profile: 'alpha' })
-  await inspectProvider('fixture')
-  expect(((await screen.findByRole('button', { name: 'Use provider' })) as HTMLButtonElement).disabled).toBe(true)
+  await inspectProvider('Fixture')
+  // Not ready: the row offers a re-check, never a Use that the backend would refuse.
+  expect(await screen.findByRole('button', { name: 'Retry' })).toBeTruthy()
+  expect(screen.queryByRole('button', { name: 'Use provider' })).toBeNull()
   fireEvent.click(await screen.findByRole('button', { name: 'Full config…' }))
   fireEvent.change(await screen.findByRole('textbox'), { target: { value: 'alpha-space' } })
   fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
@@ -105,15 +107,15 @@ it('configures and connects an inactive provider before explicit Use, with owner
     profile: 'alpha',
     body: { values: { workspace: 'alpha-space' }, activate: false }
   })
-  expect((screen.getByRole('button', { name: 'Use provider' }) as HTMLButtonElement).disabled).toBe(true)
+  expect(screen.queryByRole('button', { name: 'Use provider' })).toBeNull()
   fireEvent.click(await screen.findByRole('button', { name: 'Connect' }))
-  await waitFor(() =>
-    expect((screen.getByRole('button', { name: 'Use provider' }) as HTMLButtonElement).disabled).toBe(false)
-  )
-  expect(screen.getByText('Active: builtin')).toBeTruthy()
+  expect(await screen.findByRole('button', { name: 'Use provider' })).toBeTruthy()
+  expect(screen.getByText('Active: Built-in')).toBeTruthy()
   expect(api.mock.calls.some(([r]) => r.path === '/api/memory/provider')).toBe(false)
   fireEvent.click(screen.getByRole('button', { name: 'Use provider' }))
-  expect(await screen.findByText('Active: fixture')).toBeTruthy()
+  // Once active, the row reads as settled: no status line, no Use.
+  await waitFor(() => expect(screen.queryByText('Active: Built-in')).toBeNull())
+  expect(screen.queryByRole('button', { name: 'Use provider' })).toBeNull()
   expect(api.mock.calls.filter(([r]) => r.path === '/api/memory/provider')).toHaveLength(1)
   expect(api.mock.calls.every(([r]) => (r as any).connectionId === 'a' && (r as any).profile === 'alpha')).toBe(true)
 })
@@ -144,10 +146,10 @@ it('pins an in-flight Use and authoritative readback to A while B becomes foregr
   })
 
   renderSelection({ api }, { connectionId: 'a-host', profile: 'a' })
-  await inspectProvider('ready-a')
+  await inspectProvider('Ready A')
   fireEvent.click(await screen.findByRole('button', { name: 'Use provider' }))
   act(() => $apiRequestScope.set({ connectionId: 'b-host', profile: 'b' }))
-  await screen.findByRole('combobox', { name: 'Provider settings' })
+  await screen.findByRole('combobox', { name: 'Memory Provider' })
   await act(async () => {
     selectedA = true
     finish({ ok: true })
@@ -156,7 +158,7 @@ it('pins an in-flight Use and authoritative readback to A while B becomes foregr
   await waitFor(() =>
     expect(client.getQueryData(['memory-discovery', 'a-host', 'a'])).toMatchObject({ active: 'ready-a' })
   )
-  expect(screen.getByText('Active: builtin')).toBeTruthy()
+  expect(screen.getByRole('combobox', { name: 'Memory Provider' }).textContent).toBe('Built-in')
   expect(api.mock.calls.filter(([request]) => request.method === 'PUT').map(([request]) => request)).toEqual([
     {
       connectionId: 'a-host',
@@ -201,10 +203,10 @@ it('requires both mutation acceptance and the captured owner readback before rep
 
     const view = renderSelection({ api }, owner)
 
-    await inspectProvider(provider)
+    await inspectProvider('Ready Memory')
     fireEvent.click(await screen.findByRole('button', { name: 'Use provider' }))
     expect(await screen.findByRole('alert')).toBeTruthy()
-    expect(screen.getByText('Active: builtin')).toBeTruthy()
+    expect(screen.getByText('Active: Built-in')).toBeTruthy()
     expect(client.getQueryState(configKey)?.isInvalidated).toBe(false)
     expect((screen.getByRole('button', { name: 'Use provider' }) as HTMLButtonElement).disabled).toBe(false)
     expect(api.mock.calls.every(([request]) => request.profile === owner.profile)).toBe(true)
@@ -246,8 +248,8 @@ it('preserves a missing active identity without loading its settings and keeps i
   })
 
   renderSelection({ api }, owner)
-  const selector = await screen.findByRole('combobox', { name: 'Provider settings' })
-  await waitFor(() => expect(selector.textContent).toContain(`${provider} (Missing)`))
+  const selector = await screen.findByRole('combobox', { name: 'Memory Provider' })
+  await waitFor(() => expect(selector.textContent).toContain('Recover memory (Missing)'))
   expect(api.mock.calls.some(([request]) => request.path.includes('/providers/'))).toBe(false)
   expect(screen.queryByRole('button', { name: 'Configure' })).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: 'Review & install' }))
@@ -255,14 +257,15 @@ it('preserves a missing active identity without loading its settings and keeps i
   expect(active).toBe(provider)
   expect(api.mock.calls.some(([request]) => request.method === 'PUT')).toBe(false)
   fireEvent.click(selector)
-  expect(await screen.findByRole('option', { name: `${provider} (Missing)` })).toBeTruthy()
+  expect(await screen.findByRole('option', { name: 'Recover memory (Missing)' })).toBeTruthy()
   fireEvent.click(screen.getByRole('option', { name: 'Built-in' }))
   fireEvent.click(screen.getByRole('button', { name: 'Use provider' }))
-  expect(await screen.findByText('Active: builtin')).toBeTruthy()
+  await waitFor(() => expect(screen.queryByRole('button', { name: 'Use provider' })).toBeNull())
+  expect(screen.queryByText(/^Active:/)).toBeNull()
   expect(api.mock.calls.filter(([request]) => request.method === 'PUT').map(([request]) => request)).toEqual([
     { ...owner, priority: 'foreground', path: '/api/memory/provider', method: 'PUT', body: { provider: '' } }
   ])
-  await inspectProvider(`${provider} (Missing)`)
+  await inspectProvider('Recover memory (Missing)')
   expect(screen.getByRole('button', { name: 'Review & install' })).toBeTruthy()
 })
 
@@ -304,7 +307,7 @@ it.each([undefined, true])(
       profile: 'legacy',
       body: { values: { workspace: 'new-space' }, activate: supports_save_only !== true }
     })
-    expect(screen.getByText(`Active: ${provider}`)).toBeTruthy()
+    expect(screen.getByRole('combobox', { name: 'Memory Provider' }).textContent).toBe('Legacy Memory')
   }
 )
 
@@ -328,14 +331,14 @@ it.each([undefined, false])(
     )
 
     renderSelection({ api }, { connectionId: null, profile: 'a' })
-    await inspectProvider('a-memory')
+    await inspectProvider('A Memory')
     act(() => $apiRequestScope.set({ connectionId: 'b', profile: 'b' }))
     await act(async () => {
       release({ name: 'a-memory', label: 'A only', fields: [], supports_save_only })
       await pending
     })
     expect(screen.queryByText('A only')).toBeNull()
-    await inspectProvider('b-memory')
+    await inspectProvider('B Memory')
     expect(await screen.findByText(/Configure this provider with/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Full config…' })).toBeNull()
     expect(api.mock.calls.every(([r]) => !r.method)).toBe(true)
@@ -364,11 +367,13 @@ it('offers catalog installs inside the provider dropdown without changing select
   const openExternal = vi.fn()
   $alwaysExternalLinks.set(true)
   renderSelection({ api, openExternal }, owner)
-  const selector = await screen.findByRole('combobox', { name: 'Provider settings' })
+  const selector = await screen.findByRole('combobox', { name: 'Memory Provider' })
   expect(screen.queryByText('Featured memory')).toBeNull()
   expect($pluginInstallRequest.get()).toBeNull()
   fireEvent.click(selector)
-  expect(screen.getAllByRole('option', { name: 'installed' })).toHaveLength(1)
+  // The installed id renders once, in the Installed group, even though the catalog also lists it.
+  expect(screen.getAllByRole('option', { name: 'Installed' })).toHaveLength(1)
+  expect(screen.getByRole('group', { name: 'Installed' })).toBeTruthy()
   expect(screen.queryByText('not-eligible')).toBeNull()
   expect(screen.getByRole('group', { name: 'Available to install' })).toBeTruthy()
   const explore = screen.getByRole('option', { name: 'Explore all…' })
@@ -401,7 +406,7 @@ it('keeps the provider dropdown and marketplace available without optional catal
   renderSelection({
     api: vi.fn(async () => ({ active: '', providers: [], builtin_files: { memory: 0, user: 0 } }))
   })
-  fireEvent.click(await screen.findByRole('combobox', { name: 'Provider settings' }))
+  fireEvent.click(await screen.findByRole('combobox', { name: 'Memory Provider' }))
   expect(screen.getByRole('option', { name: 'Built-in' })).toBeTruthy()
   expect(screen.getByRole('option', { name: 'Explore all…' })).toBeTruthy()
   expect($pluginInstallRequest.get()).toBeNull()

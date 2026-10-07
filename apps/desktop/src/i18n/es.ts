@@ -3,7 +3,9 @@ import { defineFieldCopy } from '@/app/settings/field-copy'
 import { defineLocale, type TranslationOverrides } from './define-locale'
 import { esAuxTasks } from './es_aux_tasks'
 import { esBoot } from './es_boot'
+import { esLanguage } from './es_language'
 import { esLocalModels } from './es_local_models'
+import { esMemoryDiscovery } from './es_memory_discovery'
 import { esModelMenu } from './es_model_menu'
 import { esNotices } from './es_notices'
 import { esProjects } from './es_projects'
@@ -11,31 +13,7 @@ import { esSharedMetrics } from './es_shared_metrics'
 import { introEs } from './intro-es'
 
 export const esOverrides = {
-  memoryDiscovery: {
-    installed: 'Instalados',
-    availableToInstall: 'Disponibles para instalar',
-    installationRequired: 'Requiere instalación',
-    reviewInstall: 'Revisar e instalar',
-    exploreAll: 'Explorar todos…',
-    missing: 'Ausente',
-    installConsent:
-      'Instala y habilita el plugin con sus dependencias. El proveedor de memoria activo no cambia hasta que lo elijas explícitamente.',
-    builtin: 'Integrado',
-    providerSettings: 'Ajustes del proveedor',
-    configureElsewhere: 'Configura el proveedor mediante la CLI o actualiza Hermes para guardar sin activar.',
-    notReady:
-      'Completa la configuración e instala las dependencias. Tras instalar, reinicia el backend y vuelve a intentarlo.',
-    useFailed: 'No se pudo usar el proveedor. Revisa su configuración e inténtalo de nuevo.',
-
-    active: 'Activo',
-    useProvider: 'Usar proveedor',
-    loadFailed: 'No se pudieron cargar los proveedores de memoria',
-    ownerChanged: 'Vuelve a la conexión y al perfil donde abriste este instalador e inténtalo de nuevo.',
-    notDiscovered:
-      'El paquete se instaló, pero su proveedor de memoria aún no se ha detectado. Vuelve a los ajustes de memoria para intentarlo de nuevo.',
-    installedNotice: 'Proveedor detectado. Configúralo y después elige usarlo explícitamente.',
-    backToMemory: 'Volver a los ajustes de memoria'
-  },
+  memoryDiscovery: esMemoryDiscovery,
   sharedMetrics: esSharedMetrics,
   intro: introEs,
   connectors: {
@@ -718,15 +696,7 @@ export const esOverrides = {
     next: 'Siguiente coincidencia',
     previous: 'Coincidencia anterior'
   },
-  language: {
-    label: 'Idioma',
-    description: 'Elige el idioma de la interfaz de escritorio.',
-    saving: 'Guardando idioma…',
-    saveError: 'No se pudo actualizar el idioma',
-    switchTo: 'Cambiar idioma',
-    searchPlaceholder: 'Buscar idiomas…',
-    noResults: 'No se encontraron idiomas'
-  },
+  language: esLanguage,
   settings: {
     subpages: {
       appearanceTheme: 'Tema',

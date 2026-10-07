@@ -2,7 +2,9 @@ import { defineFieldCopy } from '@/app/settings/field-copy'
 
 import { deAuxTasks } from './de_aux_tasks'
 import { deBoot } from './de_boot'
+import { deLanguage } from './de_language'
 import { deLocalModels } from './de_local_models'
+import { deMemoryDiscovery } from './de_memory_discovery'
 import { deModelMenu } from './de_model_menu'
 import { deNotices } from './de_notices'
 import { deProjects } from './de_projects'
@@ -11,34 +13,7 @@ import { defineLocale, type TranslationOverrides } from './define-locale'
 import { introDe } from './intro-de'
 
 export const deOverrides = {
-  memoryDiscovery: {
-    installed: 'Installiert',
-    availableToInstall: 'Zum Installieren verfügbar',
-    installationRequired: 'Installation erforderlich',
-    reviewInstall: 'Prüfen & installieren',
-    exploreAll: 'Alle entdecken…',
-    missing: 'Fehlend',
-    installConsent:
-      'Installiert und aktiviert das Plugin mit seinen Abhängigkeiten. Der aktive Speicheranbieter bleibt bis zur ausdrücklichen Auswahl unverändert.',
-    builtin: 'Integriert',
-    providerSettings: 'Anbietereinstellungen',
-    configureElsewhere:
-      'Konfiguriere den Anbieter über die CLI oder aktualisiere Hermes für Einstellungen ohne Aktivierung.',
-    notReady:
-      'Schließe die Konfiguration ab und installiere fehlende Abhängigkeiten. Starte nach einer Installation das Backend neu und versuche es erneut.',
-    useFailed: 'Anbieter konnte nicht aktiviert werden. Prüfe die Konfiguration und versuche es erneut.',
-
-    active: 'Aktiv',
-    useProvider: 'Anbieter verwenden',
-    loadFailed: 'Speicheranbieter konnten nicht geladen werden',
-    ownerChanged:
-      'Wechsle zur Verbindung und zum Profil zurück, in denen du diese Installation geöffnet hast, und versuche es erneut.',
-    notDiscovered:
-      'Das Paket wurde installiert, sein Speicheranbieter aber noch nicht erkannt. Kehre zu den Speichereinstellungen zurück, um erneut zu suchen.',
-    installedNotice:
-      'Anbieter erkannt. Konfiguriere ihn zuerst und wähle ihn anschließend ausdrücklich zur Verwendung aus.',
-    backToMemory: 'Zurück zu den Speichereinstellungen'
-  },
+  memoryDiscovery: deMemoryDiscovery,
   sharedMetrics: deSharedMetrics,
   intro: introDe,
   connectors: {
@@ -718,15 +693,7 @@ export const deOverrides = {
     next: 'Nächster Treffer',
     previous: 'Vorheriger Treffer'
   },
-  language: {
-    label: 'Sprache',
-    description: 'Wählen Sie die Sprache der Desktop-Oberfläche.',
-    saving: 'Sprache wird gespeichert…',
-    saveError: 'Sprachupdate fehlgeschlagen',
-    switchTo: 'Sprache wechseln',
-    searchPlaceholder: 'Sprachen suchen…',
-    noResults: 'Keine Sprachen gefunden'
-  },
+  language: deLanguage,
   settings: {
     subpages: {
       appearanceTheme: 'Design',

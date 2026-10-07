@@ -153,6 +153,11 @@ export function getMemoryStatus(owner?: ResolvedOwner): Promise<MemoryStatusResp
   })
 }
 
+/** Select the owner's memory provider ('' = built-in). The backend refuses a provider that is not ready. */
+export function setMemoryProvider(owner: ResolvedOwner, provider: string): Promise<{ ok: boolean }> {
+  return hermesApiAs<{ ok: boolean }>(owner, { path: '/api/memory/provider', method: 'PUT', body: { provider } })
+}
+
 export function resetMemory(target: 'all' | 'memory' | 'user'): Promise<{ ok: boolean; deleted: string[] }> {
   return hermesApi<{ ok: boolean; deleted: string[] }>({
     ...profileScoped(),

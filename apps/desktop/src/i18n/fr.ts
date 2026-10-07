@@ -3,7 +3,9 @@ import { defineFieldCopy } from '@/app/settings/field-copy'
 import { defineLocale, type TranslationOverrides } from './define-locale'
 import { frAuxTasks } from './fr_aux_tasks'
 import { frBoot } from './fr_boot'
+import { frLanguage } from './fr_language'
 import { frLocalModels } from './fr_local_models'
+import { frMemoryDiscovery } from './fr_memory_discovery'
 import { frModelMenu } from './fr_model_menu'
 import { frNotices } from './fr_notices'
 import { frProjects } from './fr_projects'
@@ -11,32 +13,7 @@ import { frSharedMetrics } from './fr_shared_metrics'
 import { introFr } from './intro-fr'
 
 export const frOverrides = {
-  memoryDiscovery: {
-    installed: 'Installés',
-    availableToInstall: 'Disponibles à installer',
-    installationRequired: 'Installation requise',
-    reviewInstall: 'Vérifier et installer',
-    exploreAll: 'Tout explorer…',
-    missing: 'Manquant',
-    installConsent:
-      'Installe et active le plugin avec ses dépendances. Le fournisseur mémoire actif reste inchangé jusqu’à votre sélection explicite.',
-    builtin: 'Intégré',
-    providerSettings: 'Paramètres du fournisseur',
-    configureElsewhere:
-      'Configurez ce fournisseur via son assistant CLI ou mettez Hermes à jour pour enregistrer sans activer.',
-    notReady:
-      'Terminez la configuration et installez les dépendances. Après une installation, redémarrez le backend puis réessayez.',
-    useFailed: 'Impossible d’utiliser ce fournisseur. Vérifiez sa configuration et réessayez.',
-
-    active: 'Actif',
-    useProvider: 'Utiliser ce fournisseur',
-    loadFailed: 'Impossible de charger les fournisseurs de mémoire',
-    ownerChanged: 'Revenez à la connexion et au profil utilisés à l’ouverture de cet installateur, puis réessayez.',
-    notDiscovered:
-      'Le paquet est installé, mais son fournisseur de mémoire n’est pas encore détecté. Revenez aux paramètres de mémoire pour réessayer.',
-    installedNotice: 'Fournisseur détecté. Configurez-le, puis choisissez explicitement de l’utiliser.',
-    backToMemory: 'Retour aux paramètres de mémoire'
-  },
+  memoryDiscovery: frMemoryDiscovery,
   sharedMetrics: frSharedMetrics,
   intro: introFr,
   connectors: {
@@ -716,15 +693,7 @@ export const frOverrides = {
     next: 'Correspondance suivante',
     previous: 'Correspondance précédente'
   },
-  language: {
-    label: 'Langue',
-    description: "Choisissez la langue de l'interface du desktop.",
-    saving: 'Enregistrement de la langue…',
-    saveError: 'Échec de la mise à jour de la langue',
-    switchTo: 'Changer de langue',
-    searchPlaceholder: 'Rechercher des langues…',
-    noResults: 'Aucune langue trouvée'
-  },
+  language: frLanguage,
   settings: {
     subpages: {
       appearanceTheme: 'Thème',

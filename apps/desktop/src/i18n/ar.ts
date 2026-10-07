@@ -8,32 +8,12 @@ import { arCommandCenter } from './ar_command_center'
 import { arCommon } from './ar_common'
 import { arConnectors } from './ar_connectors'
 import { arDiagnostics } from './ar_diagnostics'
+import { arMemoryDiscovery } from './ar_memory_discovery'
 import { arSettings } from './ar_settings'
 import { defineLocale } from './define-locale'
 
 export const ar = defineLocale({
-  memoryDiscovery: {
-    installed: 'مثبت',
-    availableToInstall: 'متاح للتثبيت',
-    installationRequired: 'التثبيت مطلوب',
-    reviewInstall: 'مراجعة وتثبيت',
-    exploreAll: 'استكشاف الكل…',
-    missing: 'مفقود',
-    installConsent: 'يثبّت الإضافة ويفعّلها مع اعتمادياتها. لا يتغير مزوّد الذاكرة النشط حتى تختاره صراحةً.',
-    builtin: 'مدمج',
-    providerSettings: 'إعدادات المزوّد',
-    configureElsewhere: 'أعدّ المزوّد عبر CLI أو حدّث Hermes للحفظ دون تفعيل.',
-    notReady: 'أكمل الإعداد وثبّت الاعتماديات. بعد التثبيت أعد تشغيل الخلفية ثم حاول مجدداً.',
-    useFailed: 'تعذّر استخدام المزوّد. تحقّق من الإعدادات وأعد المحاولة.',
-
-    active: 'نشط',
-    useProvider: 'استخدام المزوّد',
-    loadFailed: 'تعذّر تحميل مزوّدي الذاكرة',
-    ownerChanged: 'عُد إلى الاتصال والملف الشخصي اللذين فتحت منهما برنامج التثبيت، ثم حاول مجددًا.',
-    notDiscovered: 'تم تثبيت الحزمة، لكن لم يُكتشف مزوّد الذاكرة بعد. عُد إلى إعدادات الذاكرة لإعادة المحاولة.',
-    installedNotice: 'تم اكتشاف المزوّد. أعدّه أولاً، ثم اختر استخدامه صراحةً.',
-    backToMemory: 'العودة إلى إعدادات الذاكرة'
-  },
+  memoryDiscovery: arMemoryDiscovery,
   sharedMetrics: arCommon.sharedMetrics,
   externalOpenFailed: arChrome.externalOpenFailed,
   sessionImport: arConnectors.sessionImport,

@@ -3,35 +3,16 @@ import { defineFieldCopy } from '@/app/settings/field-copy'
 import { defineLocale } from './define-locale'
 import { introZh } from './intro-zh'
 import { zhAuxTasks } from './zh_aux_tasks'
+import { zhLanguage } from './zh_language'
 import { zhLocalModels } from './zh_local_models'
+import { zhMemoryDiscovery } from './zh_memory_discovery'
 import { zhModelMenu } from './zh_model_menu'
 import { zhNotices } from './zh_notices'
 import { zhProjects } from './zh_projects'
 import { zhSharedMetrics } from './zh_shared_metrics'
 
 export const zh = defineLocale({
-  memoryDiscovery: {
-    installed: '已安装',
-    availableToInstall: '可安装',
-    installationRequired: '需要安装',
-    reviewInstall: '审核并安装',
-    exploreAll: '浏览全部…',
-    missing: '缺失',
-    installConsent: '安装并启用插件及其依赖。当前记忆提供商保持不变，直到你明确选择使用它。',
-    builtin: '内置',
-    providerSettings: '提供商设置',
-    configureElsewhere: '请使用 CLI 配置，或更新 Hermes 以保存设置而不启用。',
-    notReady: '请完成配置并安装缺失依赖。刚安装后请重启后端，再重试。',
-    useFailed: '无法使用此提供商。请检查配置后重试。',
-
-    active: '使用中',
-    useProvider: '使用提供商',
-    loadFailed: '无法加载记忆提供商',
-    ownerChanged: '请切换回打开此安装程序时的连接和配置档案，然后重试。',
-    notDiscovered: '软件包已安装，但尚未发现其记忆提供商。请返回记忆设置以重新发现。',
-    installedNotice: '已发现提供商。请先配置，再明确选择使用。',
-    backToMemory: '返回记忆设置'
-  },
+  memoryDiscovery: zhMemoryDiscovery,
   externalOpenFailed: {
     title: '无法打开此链接',
     message: '没有注册用于打开此地址的浏览器。请复制链接并手动打开。',
@@ -485,15 +466,7 @@ export const zh = defineLocale({
     previous: '上一个匹配'
   },
 
-  language: {
-    label: '语言',
-    description: '选择桌面界面的语言。',
-    saving: '正在保存语言…',
-    saveError: '语言更新失败',
-    switchTo: '切换语言',
-    searchPlaceholder: '搜索语言…',
-    noResults: '未找到语言'
-  },
+  language: zhLanguage,
 
   settings: {
     subpages: {

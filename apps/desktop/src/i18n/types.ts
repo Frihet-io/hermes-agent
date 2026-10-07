@@ -13,6 +13,8 @@ import type { AuxTaskCopyMap } from './types_aux_tasks'
 import type { BillingTranslations } from './types_billing'
 import type { BootTranslations } from './types_boot'
 import type { CatalogInstallTranslations } from './types_catalog_install'
+import type { LanguageTranslations } from './types_language'
+import type { MemoryDiscoveryTranslations } from './types_memory_discovery'
 import type { ModelMenuTranslations } from './types_model_menu'
 import type { NoticeTranslations } from './types_notices'
 import type { SidebarProjectsTranslations } from './types_projects'
@@ -72,28 +74,7 @@ interface ModeOptionCopy {
 }
 
 export interface Translations extends NoticeTranslations {
-  memoryDiscovery: {
-    installed: string
-    availableToInstall: string
-    installationRequired: string
-    reviewInstall: string
-    exploreAll: string
-    missing: string
-    installConsent: string
-    builtin: string
-    providerSettings: string
-    configureElsewhere: string
-    notReady: string
-    useFailed: string
-
-    active: string
-    useProvider: string
-    loadFailed: string
-    ownerChanged: string
-    notDiscovered: string
-    installedNotice: string
-    backToMemory: string
-  }
+  memoryDiscovery: MemoryDiscoveryTranslations
   /** Shared-metrics consent: first-run dialog + Settings › Safety toggles. */
   sharedMetrics: SharedMetricsTranslations
   appTour: AppTourTranslations
@@ -627,15 +608,7 @@ export interface Translations extends NoticeTranslations {
     previous: string
   }
 
-  language: {
-    label: string
-    description: string
-    saving: string
-    saveError: string
-    switchTo: string
-    searchPlaceholder: string
-    noResults: string
-  }
+  language: LanguageTranslations
 
   settings: {
     subpages: Record<string, string>

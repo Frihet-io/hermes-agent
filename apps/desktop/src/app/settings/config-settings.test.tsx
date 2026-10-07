@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { atom } from 'nanostores'
 import { createRef } from 'react'
 import { MemoryRouter } from 'react-router'
@@ -85,7 +85,7 @@ function renderConfigSettings(activeSectionId = 'safety') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const importInputRef = createRef<HTMLInputElement>()
 
-  render(
+  const { container } = render(
     <MemoryRouter>
       <QueryClientProvider client={client}>
         <ConfigSettings activeSectionId={activeSectionId} importInputRef={importInputRef} />
@@ -93,11 +93,11 @@ function renderConfigSettings(activeSectionId = 'safety') {
     </MemoryRouter>
   )
 
-  return { importInputRef }
+  return { container, importInputRef }
 }
 
 describe('ConfigSettings autosave', () => {
-  it('mounts one provider discovery selector and keeps imported selection out of autosave', async () => {
+  it('mounts one provider selector instead of a generic memory.provider field', async () => {
     getHermesConfigRecord.mockResolvedValue({ memory: { provider: 'builtin', memory_enabled: true } })
     getHermesConfigSchema.mockResolvedValue({
       fields: {
@@ -113,22 +113,13 @@ describe('ConfigSettings autosave', () => {
     }))
 
     vi.stubGlobal('hermesDesktop', { api })
-    const { importInputRef } = renderConfigSettings('memory')
-    expect(await screen.findByRole('combobox', { name: 'Provider settings' })).toBeTruthy()
+    const { container } = renderConfigSettings('memory')
+    expect(await screen.findByRole('combobox', { name: 'Memory Provider' })).toBeTruthy()
     expect(screen.getAllByRole('combobox')).toHaveLength(1)
     expect(screen.queryByRole('region', { name: 'Featured memory' })).toBeNull()
     expect(screen.getByRole('switch')).toBeTruthy()
-    fireEvent.change(importInputRef.current!, {
-      target: {
-        files: [
-          new File([JSON.stringify({ memory: { provider: 'unconfigured', memory_enabled: false } })], 'config.json', {
-            type: 'application/json'
-          })
-        ]
-      }
-    })
-    await waitFor(() => expect(saveHermesConfig).toHaveBeenCalled())
-    expect(saveHermesConfig.mock.calls[0][0]).toEqual({ memory: { memory_enabled: false } })
+    // The palette's "Memory Provider" hit lands on this row.
+    expect(container.querySelector('[id="setting-field-memory.provider"]')).toBeTruthy()
     expect(api.mock.calls.every(([request]) => !request?.method)).toBe(true)
   })
 

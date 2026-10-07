@@ -5,7 +5,9 @@ import { enAuxTasks } from './en_aux_tasks'
 import { enBilling } from './en_billing'
 import { enBoot } from './en_boot'
 import { enCatalogInstall } from './en_catalog_install'
+import { enLanguage } from './en_language'
 import { enLocalModels } from './en_local_models'
+import { enMemoryDiscovery } from './en_memory_discovery'
 import { enModelMenu } from './en_model_menu'
 import { enNotices } from './en_notices'
 import { enProjects } from './en_projects'
@@ -14,31 +16,7 @@ import { enUninstallSection } from './en_uninstall_section'
 import type { Translations } from './types'
 
 export const en: Translations = {
-  memoryDiscovery: {
-    installed: 'Installed',
-    availableToInstall: 'Available to install',
-    installationRequired: 'Installation required',
-    reviewInstall: 'Review & install',
-    exploreAll: 'Explore all…',
-    missing: 'Missing',
-    installConsent:
-      'Installs and enables the plugin with its dependencies. Your active memory provider stays unchanged until you choose Use provider.',
-    builtin: 'Built-in',
-    providerSettings: 'Provider settings',
-    configureElsewhere: 'Configure this provider with its CLI setup, or update Hermes for save-only settings.',
-    notReady:
-      'Finish configuration and install missing dependencies. If just installed, restart the backend, then retry.',
-    useFailed: 'Could not use this provider. Retry after checking its configuration.',
-
-    active: 'Active',
-    useProvider: 'Use provider',
-    loadFailed: 'Could not load memory providers',
-    ownerChanged: 'Switch back to the connection and profile where you opened this installer, then try again.',
-    notDiscovered:
-      'The package was installed, but its memory provider is not discovered yet. Return to Memory settings to retry discovery.',
-    installedNotice: 'Provider discovered. Configure it in Memory settings, then choose Use provider.',
-    backToMemory: 'Back to Memory settings'
-  },
+  memoryDiscovery: enMemoryDiscovery,
   externalOpenFailed: {
     title: 'Couldn’t open this link',
     message: 'No browser is registered to open this address. Copy the link and open it manually.',
@@ -714,15 +692,7 @@ export const en: Translations = {
     previous: 'Previous match'
   },
 
-  language: {
-    label: 'Language',
-    description: 'Choose the language for the desktop interface.',
-    saving: 'Saving language…',
-    saveError: 'Language update failed',
-    switchTo: 'Switch language',
-    searchPlaceholder: 'Search languages…',
-    noResults: 'No languages found'
-  },
+  language: enLanguage,
 
   settings: {
     subpages: {

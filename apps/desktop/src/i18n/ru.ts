@@ -2,6 +2,8 @@ import { defineFieldCopy } from '@/app/settings/field-copy'
 
 import { defineLocale } from './define-locale'
 import { ruAuxTasks } from './ru_aux_tasks'
+import { ruLanguage } from './ru_language'
+import { ruMemoryDiscovery } from './ru_memory_discovery'
 import { ruModelMenu } from './ru_model_menu'
 import { ruNotices } from './ru_notices'
 import { ruPluginSettings } from './ru_plugins'
@@ -30,30 +32,7 @@ const RU_NOUN = (count: number | string, one: string, few: string, many: string)
 }
 
 export const ru = defineLocale({
-  memoryDiscovery: {
-    installed: 'Установленные',
-    availableToInstall: 'Доступны для установки',
-    installationRequired: 'Требуется установка',
-    reviewInstall: 'Проверить и установить',
-    exploreAll: 'Посмотреть все…',
-    missing: 'Отсутствует',
-    installConsent:
-      'Устанавливает и включает плагин с зависимостями. Активный провайдер памяти не изменится до явного выбора.',
-    builtin: 'Встроенная',
-    providerSettings: 'Настройки провайдера',
-    configureElsewhere: 'Настройте провайдер через CLI или обновите Hermes для сохранения без активации.',
-    notReady: 'Завершите настройку и установите зависимости. После установки перезапустите бэкенд и повторите попытку.',
-    useFailed: 'Не удалось использовать провайдер. Проверьте настройки и повторите попытку.',
-
-    active: 'Активен',
-    useProvider: 'Использовать',
-    loadFailed: 'Не удалось загрузить провайдеров памяти',
-    ownerChanged: 'Вернитесь к подключению и профилю, в которых вы открыли установщик, и повторите попытку.',
-    notDiscovered:
-      'Пакет установлен, но провайдер памяти ещё не обнаружен. Вернитесь в настройки памяти для повторного поиска.',
-    installedNotice: 'Провайдер обнаружен. Сначала настройте его, затем явно выберите для использования.',
-    backToMemory: 'К настройкам памяти'
-  },
+  memoryDiscovery: ruMemoryDiscovery,
   sharedMetrics: ruSharedMetrics,
   sessionImport: {
     title: 'Продолжить из другого приложения',
@@ -438,15 +417,7 @@ export const ru = defineLocale({
     previous: 'Предыдущее вхождение'
   },
 
-  language: {
-    label: 'Язык',
-    description: 'Выберите язык интерфейса приложения.',
-    saving: 'Сохранение языка…',
-    saveError: 'Не удалось обновить язык',
-    switchTo: 'Сменить язык',
-    searchPlaceholder: 'Поиск языка…',
-    noResults: 'Языки не найдены'
-  },
+  language: ruLanguage,
   settings: {
     subpages: {
       appearanceTheme: 'Тема',

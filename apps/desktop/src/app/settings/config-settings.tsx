@@ -46,7 +46,7 @@ import {
   setNested,
   voiceFieldVisible
 } from './helpers'
-import { MemoryProviderSelection } from './memory/provider-selection'
+import { MemoryProviderSection } from './memory/provider-selection'
 import { ModelSettings, ModelSettingsSkeleton } from './model-settings'
 import { PoolLimitsSetting } from './pool-limits-setting'
 import { EmptyState, ListRow, SettingsContent, SettingsSkeleton, ToggleRow } from './primitives'
@@ -224,12 +224,6 @@ function ConfigSettingsInner({
       saveQueueRef.current = saveQueueRef.current.then(async () => {
         try {
           const patch = diffConfig(configBaselineRef.current ?? {}, snapshot)
-
-          // Provider activation belongs exclusively to the readiness-gated Use action.
-          if (patch.memory && typeof patch.memory === 'object') {
-            delete (patch.memory as Record<string, unknown>).provider
-          }
-
           const result = await saveHermesConfig(patch, writeScope ?? scopeProfile)
 
           if (!result.ok) {
@@ -244,11 +238,7 @@ function ConfigSettingsInner({
 
           // Mirror the saved record into the shared cache so MCP/model surfaces
           // reflect the edit without their own refetch.
-          writeConfigCache(previous => {
-            const active = getNested(previous ?? {}, 'memory.provider')
-
-            return active === undefined ? snapshot : setNested(snapshot, 'memory.provider', active)
-          })
+          writeConfigCache(snapshot)
           const savedScope = writeScope ?? scopeProfile
 
           recordSettingsSaved(patch, schema ?? {}, typeof savedScope === 'string' ? savedScope : savedScope?.profile)
@@ -301,12 +291,7 @@ function ConfigSettingsInner({
       return
     }
 
-    const withoutSelection =
-      getNested(next, 'memory.provider') === getNested(config ?? {}, 'memory.provider')
-        ? next
-        : setNested(next, 'memory.provider', getNested(config ?? {}, 'memory.provider'))
-
-    applyConfig(withoutSelection)
+    applyConfig(next)
   }
 
   const sectionFields = useMemo(() => {
@@ -510,31 +495,27 @@ function ConfigSettingsInner({
       {activeSectionId === 'voice' ? (
         <ListRow description={c.voiceShortcutHintDesc} title={c.voiceShortcutHintTitle} />
       ) : null}
-      {activeSectionId === 'memory' && (subpage === undefined || subpage === 'persistent') ? (
-        <MemoryProviderSelection profile={scopeProfile} />
-      ) : null}
+      <MemoryProviderSection profile={scopeProfile} sectionId={activeSectionId} subpage={subpage} />
       {showEmptyState ? (
         <EmptyState description={c.emptyDesc} title={c.emptyTitle} />
       ) : visibleFields.length === 0 ? null : (
         <div className="grid gap-1">
-          {visibleFields
-            .filter(([key]) => key !== 'memory.provider')
-            .map(([key, field]) => (
-              <div className="scroll-mt-6 rounded-lg" id={`setting-field-${key}`} key={key}>
-                <ConfigField
-                  enumOptions={
-                    key === 'tts.elevenlabs.voice_id'
-                      ? enumOptionsFor(key, getNested(config, key), config, elevenLabsVoiceOptions ?? undefined)
-                      : enumOptionsFor(key, getNested(config, key), config)
-                  }
-                  onChange={value => updateConfig(setNested(config, key, value))}
-                  optionLabels={key === 'tts.elevenlabs.voice_id' ? elevenLabsVoiceLabels : undefined}
-                  schema={field}
-                  schemaKey={key}
-                  value={getNested(config, key)}
-                />
-              </div>
-            ))}
+          {visibleFields.map(([key, field]) => (
+            <div className="scroll-mt-6 rounded-lg" id={`setting-field-${key}`} key={key}>
+              <ConfigField
+                enumOptions={
+                  key === 'tts.elevenlabs.voice_id'
+                    ? enumOptionsFor(key, getNested(config, key), config, elevenLabsVoiceOptions ?? undefined)
+                    : enumOptionsFor(key, getNested(config, key), config)
+                }
+                onChange={value => updateConfig(setNested(config, key, value))}
+                optionLabels={key === 'tts.elevenlabs.voice_id' ? elevenLabsVoiceLabels : undefined}
+                schema={field}
+                schemaKey={key}
+                value={getNested(config, key)}
+              />
+            </div>
+          ))}
         </div>
       )}
     </>

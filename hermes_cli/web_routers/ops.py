@@ -506,7 +506,8 @@ async def get_memory_status(profile: Optional[str] = None):
         featured = {entry.name: entry for entry in featured_memory_entries(network=False)}
         # Configured-but-missing rows are not installation evidence.
         discovered = {row["name"] for row in providers if row["status"] != "missing"}
-        providers = [{**row, "featured": row["name"] in discovered and row["name"] in featured}
+        providers = [{**row, "featured": row["name"] in discovered and row["name"] in featured,
+                      "title": featured[row["name"]].title if row["name"] in featured else ""}
                      for row in providers]
         catalog_providers = [
             {key: getattr(entry, key) for key in
