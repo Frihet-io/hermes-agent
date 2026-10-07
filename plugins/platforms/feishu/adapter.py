@@ -1539,7 +1539,7 @@ class FeishuAdapter(BasePlatformAdapter):
             await self._release_app_lock()
             message = f"Feishu startup failed: {exc}"
             self._set_fatal_error("feishu_connect_error", message, retryable=True)
-            logger.error("[Feishu] Failed to connect: %s", exc, exc_info=True)
+            logger.exception("[Feishu] Failed to connect: %s", exc)
             return False
 
     async def disconnect(self) -> None:
@@ -1698,7 +1698,7 @@ class FeishuAdapter(BasePlatformAdapter):
 
             return self._finalize_send_result(last_response, "send failed")
         except Exception as exc:
-            logger.error("[Feishu] Send error: %s", exc, exc_info=True)
+            logger.exception("[Feishu] Send error: %s", exc)
             return SendResult(success=False, error=str(exc))
 
     async def edit_message(self, chat_id: str, message_id: str, content: str, *, finalize: bool = False) -> SendResult:
@@ -1726,7 +1726,7 @@ class FeishuAdapter(BasePlatformAdapter):
                 result.message_id = message_id
             return result
         except Exception as exc:
-            logger.error("[Feishu] Failed to edit message %s: %s", message_id, exc, exc_info=True)
+            logger.exception("[Feishu] Failed to edit message %s: %s", message_id, exc)
             return SendResult(success=False, error=str(exc))
 
     async def delete_message(self, chat_id: str, message_id: str) -> bool:
@@ -1936,7 +1936,7 @@ class FeishuAdapter(BasePlatformAdapter):
             )
             return self._finalize_send_result(message_response, "image send failed")
         except Exception as exc:
-            logger.error("[Feishu] Failed to send image %s: %s", image_path, exc, exc_info=True)
+            logger.exception("[Feishu] Failed to send image %s: %s", image_path, exc)
             return SendResult(success=False, error=str(exc))
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
@@ -1951,7 +1951,7 @@ class FeishuAdapter(BasePlatformAdapter):
         try:
             image_path = await self._download_remote_image(image_url)
         except Exception as exc:
-            logger.error("[Feishu] Failed to download image %s: %s", image_url, exc, exc_info=True)
+            logger.exception("[Feishu] Failed to download image %s: %s", image_url, exc)
             return await super().send_image(
                 chat_id=chat_id, image_url=image_url, caption=caption, reply_to=reply_to, metadata=metadata,
             )
@@ -1969,7 +1969,7 @@ class FeishuAdapter(BasePlatformAdapter):
                 animation_url, default_ext=".gif", preferred_name="animation.gif",
             )
         except Exception as exc:
-            logger.error("[Feishu] Failed to download animation %s: %s", animation_url, exc, exc_info=True)
+            logger.exception("[Feishu] Failed to download animation %s: %s", animation_url, exc)
             return await super().send_animation(
                 chat_id=chat_id, animation_url=animation_url, caption=caption, reply_to=reply_to, metadata=metadata,
             )
@@ -3710,7 +3710,7 @@ class FeishuAdapter(BasePlatformAdapter):
                     )
             return self._finalize_send_result(message_response, "file send failed")
         except Exception as exc:
-            logger.error("[Feishu] Failed to send file %s: %s", file_path, exc, exc_info=True)
+            logger.exception("[Feishu] Failed to send file %s: %s", file_path, exc)
             return SendResult(success=False, error=str(exc))
 
     async def _send_uploaded_key(

@@ -74,7 +74,7 @@ def _trust_gate_check(server_name: str, tool_name: str) -> Optional[str]:
             f"Approve to run '{tool_name}' once, or deny to block it.",
             surface=f"mcp-trust/{server_name}", title=f"MCP server '{server_name}' is asking")
     except Exception as exc:
-        logger.error("MCP trust gate: approval check failed for %s.%s: %s", server_name, tool_name, exc, exc_info=True)
+        logger.exception("MCP trust gate: approval check failed for %s.%s: %s", server_name, tool_name, exc)
         return tool_error(f"MCP tool '{tool_name}' on untrusted server '{server_name}' was blocked: the approval "
                           f"system was unavailable (fail-closed).")
     if answer == "accept":

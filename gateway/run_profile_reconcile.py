@@ -179,7 +179,7 @@ class GatewayProfileReconcileMixin:
                 connected = 0
                 sigs[name] = scan_signature
             except Exception:
-                logger.error("[MULTIPLEX] Failed to start adapters for profile '%s'", name, exc_info=True)
+                logger.exception("[MULTIPLEX] Failed to start adapters for profile '%s'", name)
                 connected = 0
                 transient_failed.add(name)
             else:

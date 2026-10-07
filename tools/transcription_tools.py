@@ -417,7 +417,7 @@ def _transcribe_local(
             _start_idle_unload_watcher(idle_timeout)
         return _ok_result(transcript, "local")
     except Exception as e:
-        logger.error("Local transcription failed: %s", e, exc_info=True)
+        logger.exception("Local transcription failed: %s", e)
         return _error_result(f"Local transcription failed: {e}")
 
 

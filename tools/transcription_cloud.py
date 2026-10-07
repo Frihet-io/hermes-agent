@@ -76,7 +76,7 @@ def _with_openai_client(api_key: str, base_url: Optional[str], file_path: str, l
                            (APIError, "API error")):
             if isinstance(exc, cls):
                 return _error_result(f"{label}: {exc}")
-        logger.error("%s transcription failed: %s", log_label, exc, exc_info=True)
+        logger.exception("%s transcription failed: %s", log_label, exc)
         return _error_result(f"Transcription failed: {exc}")
 
 

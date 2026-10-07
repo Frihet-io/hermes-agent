@@ -107,7 +107,7 @@ class DurableTurnLease:
         try:
             self.db.release_session_turn_lease(self.session_id, self.holder)
         except Exception:
-            logger.error("Failed to release session turn lease: %s", self.session_id, exc_info=True)
+            logger.exception("Failed to release session turn lease: %s", self.session_id)
         if getattr(agent, "_active_session_turn_lease_holder", None) == self.holder:
             agent._active_session_turn_lease_holder = None
             agent._active_session_turn_lease_ttl_seconds = None

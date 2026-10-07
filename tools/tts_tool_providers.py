@@ -463,7 +463,7 @@ def _generate_mistral_tts(text: str, output_path: str, tts_config: Dict[str, Any
     except ValueError:
         raise
     except Exception as e:
-        logger.error("Mistral TTS failed: %s", e, exc_info=True)
+        logger.exception("Mistral TTS failed: %s", e)
         raise RuntimeError(f"Mistral TTS failed: {type(e).__name__}") from e
     return _write_bytes(output_path, audio_bytes)
 

@@ -646,9 +646,9 @@ class SessionTranscriptMixin:
         except Exception as e:
             # Empty history is valid data; a failed canonical read is not — live-replay callers
             # must fail closed, not start from [].
-            logger.error(
+            logger.exception(
                 "Transcript read failed for session %s; refusing to treat the conversation as "
-                "empty: %s", session_id, e, exc_info=True)
+                "empty: %s", session_id, e)
             raise TranscriptReadError(session_id) from e
 
     def rewind_session(

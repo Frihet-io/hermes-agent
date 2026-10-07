@@ -1372,10 +1372,10 @@ class SessionDB(
         except Exception:
             # No retention capability is bound on this runtime, so close() will let SQLite run the
             # checkpoint over the newer generation: say so where an operator can see it.
-            logger.error(
+            logger.exception(
                 "Could not disable SQLite's close-time checkpoint on the quarantined handle for %s; "
                 "closing it may checkpoint retired frames over the newer generation.",
-                self.db_path, exc_info=True,
+                self.db_path,
             )
             return False
         return True

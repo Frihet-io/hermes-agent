@@ -426,7 +426,7 @@ class PlatformRegistry:
         try:
             return entry.adapter_factory(config)
         except Exception as e:
-            logger.error("Failed to create adapter for platform '%s': %s", entry.label, e, exc_info=True)
+            logger.exception("Failed to create adapter for platform '%s': %s", entry.label, e)
             return None
 
 

@@ -222,7 +222,7 @@ class QQAdapter(OwnAccessPolicyMixin, BasePlatformAdapter):
         except Exception as exc:
             message = f"QQ startup failed: {exc}"
             self._set_fatal_error("qq_connect_error", message, retryable=True)
-            logger.error("[%s] %s", self._log_tag, message, exc_info=True)
+            logger.exception("[%s] %s", self._log_tag, message)
             await self._cleanup()
             self._release_platform_lock()
             return False
@@ -626,7 +626,7 @@ class QQAdapter(OwnAccessPolicyMixin, BasePlatformAdapter):
         try:
             await callback(event)
         except Exception as exc:
-            logger.error("[%s] Interaction callback raised: %s", self._log_tag, exc, exc_info=True)
+            logger.exception("[%s] Interaction callback raised: %s", self._log_tag, exc)
 
     async def _acknowledge_interaction(self, interaction_id: str, code: int = 0) -> None:
         """ACK a button interaction via ``PUT /interactions/{id}`` (code 0 = success)."""

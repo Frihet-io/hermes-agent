@@ -1496,7 +1496,7 @@ def check_terminal_requirements() -> bool:
         checker = _REQUIREMENT_CHECKERS.get(config["env_type"], _check_plugin_requirements)
         return checker(config)
     except Exception as e:
-        logger.error("Terminal requirements check failed: %s", e, exc_info=True)
+        logger.exception("Terminal requirements check failed: %s", e)
         _record_unavailable_reason(f"the requirements check failed: {e}")
         return False
 

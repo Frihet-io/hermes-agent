@@ -415,18 +415,18 @@ def _run_git(
         return ok, stdout, stderr
     except subprocess.TimeoutExpired:
         msg = f"git timed out after {timeout}s: {' '.join(cmd)}"
-        logger.error(msg, exc_info=True)
+        logger.exception(msg)
         return False, "", msg
     except FileNotFoundError as exc:
         missing_target = getattr(exc, "filename", None)
         if missing_target == "git":
-            logger.error("Git executable not found: %s", " ".join(cmd), exc_info=True)
+            logger.exception("Git executable not found: %s", " ".join(cmd))
             return False, "", "git not found"
         msg = f"working directory not found: {normalized_working_dir}"
-        logger.error("Git command failed before execution: %s (%s)", " ".join(cmd), msg, exc_info=True)
+        logger.exception("Git command failed before execution: %s (%s)", " ".join(cmd), msg)
         return False, "", msg
     except Exception as exc:
-        logger.error("Unexpected git error running %s: %s", " ".join(cmd), exc, exc_info=True)
+        logger.exception("Unexpected git error running %s: %s", " ".join(cmd), exc)
         return False, "", str(exc)
 
 

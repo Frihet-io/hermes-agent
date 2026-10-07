@@ -342,7 +342,7 @@ class DiscordMediaMixin:
                         raise
                 return SendResult(success=True, message_id=str(msg.id))
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to send audio: %s", self.name, e, exc_info=True)
+            logger.exception("[%s] Failed to send audio: %s", self.name, e)
             return SendResult(success=False, error=str(e))
 
 
@@ -353,7 +353,7 @@ class DiscordMediaMixin:
         except FileNotFoundError:
             return SendResult(success=False, error=f"{not_found}: {path}")
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to send %s: %s", self.name, kind, e, exc_info=True)
+            logger.exception("[%s] Failed to send %s: %s", self.name, kind, e)
             return SendResult(success=False, error=str(e))
 
 
@@ -404,7 +404,7 @@ class DiscordMediaMixin:
             logger.warning("[%s] aiohttp not installed, falling back to URL. Run: pip install aiohttp", self.name, exc_info=True)
             return await fallback(error_metadata)
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to send %s attachment, falling back to URL: %s", self.name, kind, e, exc_info=True)
+            logger.exception("[%s] Failed to send %s attachment, falling back to URL: %s", self.name, kind, e)
             return await fallback(error_metadata)
 
 

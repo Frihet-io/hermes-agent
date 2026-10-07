@@ -972,7 +972,7 @@ class MatrixAdapter(BasePlatformAdapter):
                     "installation. Generate a new access token with a fresh device.", client.device_id)
                 return False
         except Exception as exc:
-            logger.error("Matrix: post-upload key verification failed: %s", exc, exc_info=True)
+            logger.exception("Matrix: post-upload key verification failed: %s", exc)
             return False
         return True
 
@@ -1068,7 +1068,7 @@ class MatrixAdapter(BasePlatformAdapter):
         try:
             our_keys = await self._query_own_device_keys(client)
         except Exception as exc:
-            logger.error("Matrix: cannot verify device keys on server: %s — refusing E2EE", exc, exc_info=True)
+            logger.exception("Matrix: cannot verify device keys on server: %s — refusing E2EE", exc)
             return False
         local_ed25519 = olm.account.identity_keys.get("ed25519")
 
@@ -1076,7 +1076,7 @@ class MatrixAdapter(BasePlatformAdapter):
             try:
                 await olm.share_keys()
             except Exception as exc:
-                logger.error(error_fmt, *error_args, exc, exc_info=True)
+                logger.exception(error_fmt, *error_args, exc)
                 return False
             return await self._reverify_keys_after_upload(client, local_ed25519)
         if not our_keys:
@@ -1153,8 +1153,8 @@ class MatrixAdapter(BasePlatformAdapter):
                     "Matrix: using access token for %s%s", self._user_id or "(unknown user)",
                     f" (device {effective_device_id})" if effective_device_id else "")
             except Exception as exc:
-                logger.error(
-                    "Matrix: whoami failed — check MATRIX_ACCESS_TOKEN and MATRIX_HOMESERVER: %s", exc, exc_info=True)
+                logger.exception(
+                    "Matrix: whoami failed — check MATRIX_ACCESS_TOKEN and MATRIX_HOMESERVER: %s", exc)
                 return await self._abort_connect(api)
         elif self._password and self._user_id:
             try:

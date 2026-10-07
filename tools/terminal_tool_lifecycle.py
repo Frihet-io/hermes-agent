@@ -274,7 +274,7 @@ def cleanup_all_environments():
             cleanup_vm(task_id)
             cleaned += 1
         except Exception as e:
-            logger.error("Error cleaning %s: %s", task_id, e, exc_info=True)
+            logger.exception("Error cleaning %s: %s", task_id, e)
 
     # Also clean any orphaned directories
     for path in _scratch_paths():

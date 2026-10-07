@@ -1659,7 +1659,7 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
             self._wire_plugin_handlers(self._client)
             return True
         except asyncio.TimeoutError:
-            logger.error("[%s] Timeout waiting for connection to Discord", self.name, exc_info=True)
+            logger.exception("[%s] Timeout waiting for connection to Discord", self.name)
             # Cancel the bot task so a discarded adapter can't fire on_message (two clients answering).
             await self._cancel_bot_task()
             self._release_platform_lock()
@@ -1670,7 +1670,7 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
             )
             return False
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to connect to Discord: %s", self.name, e, exc_info=True)
+            logger.exception("[%s] Failed to connect to Discord: %s", self.name, e)
             # Same zombie-client hazard: client.start() may already run when a later step raises.
             await self._cancel_bot_task()
             self._release_platform_lock()
@@ -3368,7 +3368,7 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
             )
             return await self._record_response_async(reply_to, result, content, final_delivery, metadata)
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to send Discord message: %s", self.name, e, exc_info=True)
+            logger.exception("[%s] Failed to send Discord message: %s", self.name, e)
             if _is_discord_transport_error(e):
                 # Connection-shaped failure: runtime-retryable marker so the reconnect sweep can replay it.
                 result = SendResult(success=False, error="send_path_degraded", retryable=True)
@@ -3527,7 +3527,7 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
                 await self._record_response_async((metadata or {}).get("reply_to_message_id"), result, content, True)
             return result
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to edit Discord message %s: %s", self.name, message_id, e, exc_info=True)
+            logger.exception("[%s] Failed to edit Discord message %s: %s", self.name, message_id, e)
             return SendResult(success=False, error=str(e))
 
     @staticmethod
@@ -3563,8 +3563,8 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
         try:
             await msg.edit(content=chunks[0])
         except Exception as e:
-            logger.error(
-                "[%s] Overflow split: first-chunk edit failed: %s", self.name, e, exc_info=True,
+            logger.exception(
+                "[%s] Overflow split: first-chunk edit failed: %s", self.name, e,
             )
             return SendResult(success=False, error=str(e))
         continuation_ids: list[str] = []
@@ -4083,7 +4083,7 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
         except asyncio.CancelledError:
             pass
         except Exception as e:
-            logger.error("Voice listen loop error: %s", e, exc_info=True)
+            logger.exception("Voice listen loop error: %s", e)
 
     async def _process_voice_input(self, guild_id: int, user_id: int, pcm_data: bytes, captured_for: int | None):
         """Convert PCM -> WAV -> STT -> callback; dropped if the binding moved off *captured_for* during STT."""
@@ -4455,7 +4455,7 @@ class DiscordAdapter(DiscordMediaMixin, DiscordThreadTitlesMixin, DiscordVoiceIn
                 "guild_name": channel.guild.name if hasattr(channel, "guild") and channel.guild else None,
             }
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[%s] Failed to get chat info for %s: %s", self.name, chat_id, e, exc_info=True)
+            logger.exception("[%s] Failed to get chat info for %s: %s", self.name, chat_id, e)
             return {"name": str(chat_id), "type": "dm", "error": str(e)}
 
     async def _resolve_allowed_usernames(self) -> None:
@@ -6606,7 +6606,7 @@ def _define_discord_view_classes() -> None:
                     self.session_key, choice, interaction.user.display_name,
                 )
             except Exception as exc:
-                logger.error("Discord slash-confirm resolve failed: %s", exc, exc_info=True)
+                logger.exception("Discord slash-confirm resolve failed: %s", exc)
 
         @discord.ui.button(label="Approve Once", style=discord.ButtonStyle.green)
         async def approve_once(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -7296,7 +7296,7 @@ async def _standalone_send(
         return result
     except Exception as e:
         # Include the exception type: str(TimeoutError()) is empty.
-        logger.error("Discord standalone send failed", exc_info=True)
+        logger.exception("Discord standalone send failed")
         return send_error(f"Discord send failed: {type(e).__name__}: {e}")
 
 

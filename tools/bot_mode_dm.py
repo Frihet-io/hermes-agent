@@ -755,7 +755,7 @@ def _spawn_delivery(command: str, label: str, *, dm_file: Optional[str] = None, 
             "queued_at": int(time.time()),
         })
     except Exception as exc:
-        logger.error("message_agent delivery spawn failed: %s", exc, exc_info=True)
+        logger.exception("message_agent delivery spawn failed: %s", exc)
         return _err(f"Delivery to {label} could not be started: {exc}")
     finally:
         if dm_file and not transferred:

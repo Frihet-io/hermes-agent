@@ -437,7 +437,7 @@ class TeamsAdapter(BasePlatformAdapter):
             return True
         except Exception as e:
             self._set_fatal_error("CONNECT_FAILED", f"Teams connection failed: {e}", retryable=True)
-            logger.error("[teams] Failed to connect: %s", e, exc_info=True)
+            logger.exception("[teams] Failed to connect: %s", e)
             return False
 
     async def disconnect(self) -> None:
@@ -701,7 +701,7 @@ class TeamsAdapter(BasePlatformAdapter):
             result = await self._send_card(prompt.chat_id, card)
             return SendResult(success=True, message_id=getattr(result, "id", None) if result else None)
         except Exception as e:
-            logger.error("[teams] send_exec_approval failed: %s", e, exc_info=True)
+            logger.exception("[teams] send_exec_approval failed: %s", e)
             return SendResult(success=False, error=str(e), retryable=True)
 
     async def send(
@@ -759,7 +759,7 @@ class TeamsAdapter(BasePlatformAdapter):
             result = await self._send_via_conv_ref(chat_id, activity, activity)
             return SendResult(success=True, message_id=getattr(result, "id", None))
         except Exception as e:
-            logger.error("[teams] send_%s failed: %s", media_label, e, exc_info=True)
+            logger.exception("[teams] send_%s failed: %s", media_label, e)
             return SendResult(success=False, error=str(e), retryable=True)
 
     async def send_image(self, chat_id: str, image_url: str, caption: Optional[str] = None, reply_to: Optional[str] = None,

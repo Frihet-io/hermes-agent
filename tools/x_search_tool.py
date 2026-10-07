@@ -264,14 +264,14 @@ def x_search_tool(
         }
         return json.dumps(result, ensure_ascii=False)
     except requests.HTTPError as e:
-        logger.error("x_search failed: %s", e, exc_info=True)
+        logger.exception("x_search failed: %s", e)
         return _error_json(_http_error_message(e), e)
     except requests.ReadTimeout as e:
-        logger.error("x_search timed out: %s", e, exc_info=True)
+        logger.exception("x_search timed out: %s", e)
         timeout = _get_x_search_int("timeout_seconds", DEFAULT_X_SEARCH_TIMEOUT_SECONDS, 30)
         return _error_json(f"xAI x_search timed out after {timeout} seconds", e)
     except Exception as e:
-        logger.error("x_search failed: %s", e, exc_info=True)
+        logger.exception("x_search failed: %s", e)
         return _error_json(str(e), e)
 
 

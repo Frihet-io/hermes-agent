@@ -369,7 +369,7 @@ class CLIChatTurnMixin:
                 self._pending_moa_restore_model = None
                 self._pending_moa_disable_after_turn = False
         except Exception as exc:
-            logging.error("run_conversation raised: %s", exc, exc_info=True)
+            logging.exception("run_conversation raised: %s", exc)
             _summary = getattr(self.agent, '_summarize_api_error', lambda e: str(e)[:300])(exc)
             from hermes_cli.cli_chat_error_copy import chat_error_response
             turn.result = {

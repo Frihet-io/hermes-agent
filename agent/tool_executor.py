@@ -1361,7 +1361,7 @@ class _ConcurrentBatch:
             return _ToolOutcome(ref, result, duration, True, False)
         except Exception as tool_error:
             result = f"Error executing tool '{ref.name}': {tool_error}"
-            logger.error("_invoke_tool raised for %s: %s", ref.name, tool_error, exc_info=True)
+            logger.exception("_invoke_tool raised for %s: %s", ref.name, tool_error)
         duration = time.time() - start
         if not blocked and not dispatched:
             ref.emit_post(agent, result, duration_ms=int(duration * 1000))
@@ -1777,7 +1777,7 @@ def _run_sequential_call(
         if dispatch.error_result is None:
             raise
         function_result = dispatch.error_result(tool_error)
-        logger.error(dispatch.error_log, ref.name, tool_error, exc_info=True)
+        logger.exception(dispatch.error_log, ref.name, tool_error)
         managed = _ManagedToolResult(result=function_result, args=ref.args, middleware_trace=ref.trace, blocked=False, dispatched=False)
     finally:
         if dispatch.is_delegate:

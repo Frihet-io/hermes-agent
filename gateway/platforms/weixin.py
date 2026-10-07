@@ -866,7 +866,7 @@ class WeixinAdapter(OwnAccessPolicyMixin, BasePlatformAdapter):
         try:
             await self._process_message(message)
         except Exception as exc:
-            logger.error("[%s] unhandled inbound error from=%s: %s", self.name, _safe_id(message.get("from_user_id")), exc, exc_info=True)
+            logger.exception("[%s] unhandled inbound error from=%s: %s", self.name, _safe_id(message.get("from_user_id")), exc)
 
     async def _process_message(self, message: Dict[str, Any]) -> None:
         assert self._poll_session is not None

@@ -761,7 +761,7 @@ class AudioRecorder(_RecorderBase):
             try:
                 cb()
             except Exception as e:
-                logger.error("Silence callback failed: %s", e, exc_info=True)
+                logger.exception("Silence callback failed: %s", e)
         threading.Thread(target=_safe_cb, daemon=True).start()
 
     def _on_audio_block(self, np, indata) -> None:

@@ -118,7 +118,7 @@ def _guarded_cleanup(label: str, fn: Callable[[], Any], errors: List[str], logge
         fn()
     except Exception as err:
         errors.append(f"{label}: {err}")
-        logger.error("finalize_turn: _%s failed: %s", label, err, exc_info=True)
+        logger.exception("finalize_turn: _%s failed: %s", label, err)
 
 
 def _resolve_budget_fallback(

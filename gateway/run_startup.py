@@ -1378,7 +1378,7 @@ class GatewayStartupMixin:
             self._startup_fail_fatal_config(str(e))
             return True, connected_count
         except Exception as e:
-            logger.error("Secondary-profile adapter startup failed: %s", e, exc_info=True)
+            logger.exception("Secondary-profile adapter startup failed: %s", e)
         finally:
             # Startup authority is one phase: from here on every adapter retry is non-evicting.
             self._platform_lock_takeover_on_start = False
@@ -1476,9 +1476,9 @@ class GatewayStartupMixin:
         try:
             await self._ensure_hosted_room_worker()
         except Exception:
-            logger.error(
+            logger.exception(
                 "Group Chat worker failed to start; mutating Group Chat commands "
-                "will fail closed until supervision recovers it", exc_info=True,
+                "will fail closed until supervision recovers it",
             )
         self._spawn_supervised(self._hosted_room_worker_watcher, "hosted_room_worker")
         self._start_loop_heartbeat_task()
@@ -1705,9 +1705,9 @@ class GatewayStartupMixin:
         try:
             return load_gateway_config(), secondary
         except Exception as exc:
-            logger.error(
+            logger.exception(
                 "Handoff: could not load config for profile %s; failing the handoff instead of "
-                "delivering via the primary's config", profile_name, exc_info=True,
+                "delivering via the primary's config", profile_name,
             )
             raise RuntimeError(f"could not load config for profile '{profile_name}': {exc}") from exc
 

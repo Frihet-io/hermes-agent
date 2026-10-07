@@ -279,7 +279,7 @@ def _upscale_image(image_url: str, original_prompt: str) -> Optional[Dict[str, A
         # A user interrupt must not degrade into a silent "use original" fallback.
         raise
     except Exception as e:
-        logger.error("Error upscaling image: %s", e, exc_info=True)
+        logger.exception("Error upscaling image: %s", e)
         return None
 
 
@@ -478,7 +478,7 @@ def image_generate_tool(
             "upscaled": bool(formatted_images[0].get("upscaled"))})
     except Exception as e:
         error_msg = f"Error generating image: {str(e)}"
-        logger.error("%s", error_msg, exc_info=True)
+        logger.exception("%s", error_msg)
         debug_call_data["error"] = error_msg
         generation_time = (datetime.datetime.now() - start_time).total_seconds()
         return finish(generation_time,

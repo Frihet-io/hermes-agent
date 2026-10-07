@@ -697,7 +697,7 @@ class WhatsAppAdapter(WhatsAppBehaviorMixin, BasePlatformAdapter):
             self._wire_plugin_handlers(None)
             return True
         except Exception as e:
-            logger.error("[%s] Failed to start bridge: %s", self.name, e, exc_info=True)
+            logger.exception("[%s] Failed to start bridge: %s", self.name, e)
             return False
         finally:
             if not self._running:

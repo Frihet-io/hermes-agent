@@ -77,7 +77,7 @@ def _transcode_audio_for_stt(file_path: str, work_dir: str) -> tuple[Optional[st
         logger.error("ffmpeg STT transcode failed for %s: %s", file_path, details)
         return None, f"failed to transcode audio for the STT API: {details}"
     except Exception as exc:  # noqa: BLE001 - transcode is best-effort
-        logger.error("unexpected STT transcode failure for %s: %s", file_path, exc, exc_info=True)
+        logger.exception("unexpected STT transcode failure for %s: %s", file_path, exc)
         return None, f"failed to transcode audio for the STT API: {exc}"
 
 
@@ -136,7 +136,7 @@ def _prepare_audio_for_transcription(file_path: str) -> tuple[Optional[str], Opt
         return converted_path, temp_dir, None
     except Exception as exc:
         shutil.rmtree(temp_dir, ignore_errors=True)
-        logger.error("Failed to convert .silk audio %s: %s", file_path, exc, exc_info=True)
+        logger.exception("Failed to convert .silk audio %s: %s", file_path, exc)
         return None, None, _error_result(f"Failed to convert .silk audio for transcription: {exc}")
 
 

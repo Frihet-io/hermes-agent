@@ -85,7 +85,7 @@ def stage_write(subsystem: str, payload: Dict[str, Any], *, summary: str, origin
     try:
         atomic_json_write(_pending_path(subsystem, pid), record)
     except Exception as e:  # pragma: no cover - disk failure path
-        logger.error("Failed to stage pending %s write: %s", subsystem, e, exc_info=True)
+        logger.exception("Failed to stage pending %s write: %s", subsystem, e)
     return record
 
 

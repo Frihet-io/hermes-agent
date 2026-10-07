@@ -696,7 +696,7 @@ class BatchRunner:
                     pool.join()
                     raise
                 except Exception as e:
-                    logger.error("Batch worker failed: %s", e, exc_info=True)
+                    logger.exception("Batch worker failed: %s", e)
                     pool.terminate()
                     pool.join()
                     raise

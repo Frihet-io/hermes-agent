@@ -1320,7 +1320,7 @@ class SlackAdapter(BasePlatformAdapter):
             try:
                 self._start_socket_mode_handler()
             except Exception as exc:  # pragma: no cover - defensive logging
-                logger.error("[Slack] Socket Mode reconnect failed: %s", exc, exc_info=True)
+                logger.exception("[Slack] Socket Mode reconnect failed: %s", exc)
 
     async def _socket_watchdog_loop(self) -> None:
         """Monitor Socket Mode and reconnect if the task/transport dies.
@@ -1716,9 +1716,8 @@ class SlackAdapter(BasePlatformAdapter):
                 try:
                     await cb(ack, body, action)
                 except Exception as exc:  # pragma: no cover - defensive
-                    logger.error(
-                        "[Slack] Plugin '%s' action handler raised: %s", plugin_name, exc,
-                        exc_info=True)
+                    logger.exception(
+                        "[Slack] Plugin '%s' action handler raised: %s", plugin_name, exc)
                     # Best-effort ack so Slack doesn't retry the click.
                     try:
                         await ack()
@@ -1838,7 +1837,7 @@ class SlackAdapter(BasePlatformAdapter):
             self._hint_allow_bots()
             return True
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[Slack] Connection failed: %s", e, exc_info=True)
+            logger.exception("[Slack] Connection failed: %s", e)
             return False
         finally:
             if lock_acquired and not self._running:
@@ -2122,7 +2121,7 @@ class SlackAdapter(BasePlatformAdapter):
                         "chat.appendStream", json={"channel": chat_id, "ts": stream.stream_ts, "chunks": chunks})
                 return SendResult(success=True, message_id=stream.stream_ts)
             except Exception as exc:  # pragma: no cover - defensive logging
-                logger.error("[Slack] Native task-card progress error: %s", exc, exc_info=True)
+                logger.exception("[Slack] Native task-card progress error: %s", exc)
                 return SendResult(success=False, error=str(exc), retryable=True)
 
     @staticmethod
@@ -2268,7 +2267,7 @@ class SlackAdapter(BasePlatformAdapter):
             # (formatting, slash-context, DM resolution): stop_typing falls back to metadata / the uniquely
             # tracked status for this channel, so a failed turn cannot leave "is thinking..." visible
             # (#24117).
-            logger.error("[Slack] Send error: %s", e, exc_info=True)
+            logger.exception("[Slack] Send error: %s", e)
             _retryable = self._is_retryable_upload_error(e)
             return SendResult(
                 success=False, error=str(e), retryable=_retryable,
@@ -2348,7 +2347,7 @@ class SlackAdapter(BasePlatformAdapter):
                 success=True, message_id=result.get("message_ts") or result.get("ts"),
                 raw_response=result)
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[Slack] Ephemeral send error: %s", e, exc_info=True)
+            logger.exception("[Slack] Ephemeral send error: %s", e)
             return SendResult(success=False, error=str(e))
 
     async def send_or_update_status(
@@ -2417,17 +2416,17 @@ class SlackAdapter(BasePlatformAdapter):
             if _is_transient_transport_error(e):
                 # chat.update is idempotent: keep the message ID after a transport failure so a
                 # later edit can catch up, else every later tool update becomes a new post.
-                logger.error(
+                logger.exception(
                     "[Slack] transient chat.update failure on message %s in channel %s: %s",
-                    message_id, chat_id, e, exc_info=True)
+                    message_id, chat_id, e)
                 return SendResult(
                     success=False, error=str(e), retryable=True, error_kind="transient")
             # An HTTP 200 + ``ok=false`` reply raises too; its ``str()`` reads like a transport
             # failure ("status: 200") while the real cause is the body's error code.
             api_error = _slack_response_payload(getattr(e, "response", None)).get("error")
-            logger.error(
+            logger.exception(
                 "[Slack] Failed to edit message %s in channel %s: api_error=%s: %s",
-                message_id, chat_id, api_error or "none", e, exc_info=True)
+                message_id, chat_id, api_error or "none", e)
             return SendResult(success=False, error=str(e))
 
     async def delete_message(self, chat_id: str, message_id: str) -> bool:
@@ -2962,8 +2961,8 @@ class SlackAdapter(BasePlatformAdapter):
             return await self._upload_with_retry(
                 chat_id, file_path, filename, caption, thread_ts, metadata, label)
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error(
-                "[%s] Failed to send %s %s: %s", self.name, kind, file_path, e, exc_info=True)
+            logger.exception(
+                "[%s] Failed to send %s %s: %s", self.name, kind, file_path, e)
             return await self._send_failure_notice(
                 chat_id, caption, failure_notice, reply_to, metadata)
 
@@ -3447,8 +3446,8 @@ class SlackAdapter(BasePlatformAdapter):
         except FileNotFoundError:
             return SendResult(success=False, error=f"Image file not found: {image_path}")
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error(
-                "[%s] Failed to send local Slack image %s: %s", self.name, image_path, e, exc_info=True
+            logger.exception(
+                "[%s] Failed to send local Slack image %s: %s", self.name, image_path, e
             )
             return await self._send_failure_notice(
                 chat_id, caption, t("platform.shared.media.image_failed"), reply_to, metadata)
@@ -3511,7 +3510,7 @@ class SlackAdapter(BasePlatformAdapter):
         except FileNotFoundError:
             return SendResult(success=False, error=f"Audio file not found: {audio_path}")
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[Slack] Failed to send audio file %s: %s", audio_path, e, exc_info=True)
+            logger.exception("[Slack] Failed to send audio file %s: %s", audio_path, e)
             return SendResult(success=False, error=str(e))
 
     async def send_video(
@@ -3544,7 +3543,7 @@ class SlackAdapter(BasePlatformAdapter):
             is_dm = channel.get("is_im", False)
             return {"name": channel.get("name", chat_id), "type": "dm" if is_dm else "group"}
         except Exception as e:  # pragma: no cover - defensive logging
-            logger.error("[Slack] Failed to fetch chat info for %s: %s", chat_id, e, exc_info=True)
+            logger.exception("[Slack] Failed to fetch chat info for %s: %s", chat_id, e)
             return {"name": chat_id, "type": "unknown"}
 
     # ----- Internal handlers -----
@@ -4939,7 +4938,7 @@ class SlackAdapter(BasePlatformAdapter):
                 self._trim_oldest_dict_entries(resolved, resolved_max)
             return SendResult(success=True, message_id=msg_ts, raw_response=result)
         except Exception as e:
-            logger.error("[Slack] %s failed: %s", label, e, exc_info=True)
+            logger.exception("[Slack] %s failed: %s", label, e)
             return SendResult(success=False, error=str(e))
 
     _EA_CODE_OPEN = "```"
@@ -5191,7 +5190,7 @@ class SlackAdapter(BasePlatformAdapter):
 
             return SendResult(success=True, message_id=msg_ts, raw_response=result)
         except Exception as e:
-            logger.error("[Slack] send_model_picker failed: %s", e, exc_info=True)
+            logger.exception("[Slack] send_model_picker failed: %s", e)
             return SendResult(success=False, error=str(e))
 
     async def _update_picker_message(
@@ -5394,7 +5393,7 @@ class SlackAdapter(BasePlatformAdapter):
                 if _error_prefix and str(confirmation).startswith(_error_prefix):
                     switch_failed = True
             except Exception as exc:
-                logger.error("[Slack] Model picker callback failed: %s", exc, exc_info=True)
+                logger.exception("[Slack] Model picker callback failed: %s", exc)
                 confirmation = t("platform.slack.picker.switch_failed", error=str(exc))
                 switch_failed = True
 
@@ -5601,8 +5600,8 @@ class SlackAdapter(BasePlatformAdapter):
                 "Slack button resolved slash-confirm for session %s (choice=%s, user=%s)",
                 session_key, choice, user_name)
         except Exception as exc:
-            logger.error(
-                "Failed to resolve slash-confirm from Slack button: %s", exc, exc_info=True)
+            logger.exception(
+                "Failed to resolve slash-confirm from Slack button: %s", exc)
 
     async def _handle_feedback_action(self, ack, body, action) -> None:
         """Ack Slack AI feedback button clicks and log the choice."""
@@ -6703,7 +6702,7 @@ async def _standalone_send_media(
             last_message_id = upload_result.get("message_id") or last_message_id
         except Exception as e:
             warning = f"Failed to send media {media_path}: {e}"
-            logger.error("[Slack] %s", warning, exc_info=True)
+            logger.exception("[Slack] %s", warning)
             warnings.append(warning)
     if last_message_id is None and not uploaded_any and not text_to_send.strip():
         result: Dict[str, Any] = {"error": "No deliverable text or media remained after processing"}

@@ -126,7 +126,7 @@ def _ask_human(command: str, description: str, timeout_seconds: int, allow_perma
                                **({"title": title} if title and callback_accepts(approval_callback, "title") else {})}
             return approval_callback(display_command, display_description, **callback_kwargs)
         except Exception as e:
-            logger.error("Approval callback failed: %s", e, exc_info=True)
+            logger.exception("Approval callback failed: %s", e)
             return Unanswered(f"the approval callback failed: {type(e).__name__}")
 
     # Fail-closed guard: when prompt_toolkit owns the terminal and no callback is registered on this thread, the
@@ -321,7 +321,7 @@ def request_elicitation_consent(message: str, description: str, *,
                                          "pattern_key": "mcp_elicitation",
                                          "pattern_keys": ["mcp_elicitation"]}, surface=surface)
         except Exception as exc:
-            logger.error("Elicitation gateway dispatch failed: %s", exc, exc_info=True)
+            logger.exception("Elicitation gateway dispatch failed: %s", exc)
             return "decline"
         if decision.get("notify_failed"):
             return "decline"
@@ -350,7 +350,7 @@ def request_elicitation_consent(message: str, description: str, *,
                                            approval_callback=_get_approval_callback())
         hook_choice = choice
     except Exception as exc:
-        logger.error("Elicitation CLI prompt failed: %s", exc, exc_info=True)
+        logger.exception("Elicitation CLI prompt failed: %s", exc)
         return "decline"
     finally:
         _ctx._fire_approval_hook("post_approval_response", **hook_kwargs, choice=hook_choice)

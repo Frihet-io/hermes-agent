@@ -317,8 +317,8 @@ async def _download_media(
         except Exception as e:
             last_error = e
             if attempt >= max_retries - 1 or (not retry_all and not _is_retryable_download_error(e)):
-                logger.error("%s download failed after %s attempt(s): %s",
-                             media_label, attempt + 1, str(e)[:100], exc_info=True)
+                logger.exception("%s download failed after %s attempt(s): %s",
+                             media_label, attempt + 1, str(e)[:100])
                 if not retry_all:
                     raise
                 break
@@ -866,7 +866,7 @@ async def _run_analysis(
         return finish(result)
     except Exception as e:
         error_msg = f"Error analyzing {kind}: {str(e)}"
-        logger.error("%s", error_msg, exc_info=True)
+        logger.exception("%s", error_msg)
         err_str = str(e).lower()
         template = next(
             (tpl for hints, tpl in rules if any(hint in err_str for hint in hints)),

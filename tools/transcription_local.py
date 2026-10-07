@@ -340,5 +340,5 @@ def _transcribe_local_command(
         logger.error("Local STT command failed for %s: %s", file_path, details)
         return _error_result(f"Local STT failed: {details}")
     except Exception as e:
-        logger.error("Unexpected error during local command transcription: %s", e, exc_info=True)
+        logger.exception("Unexpected error during local command transcription: %s", e)
         return _error_result(f"Local transcription failed: {e}")

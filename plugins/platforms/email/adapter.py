@@ -934,7 +934,7 @@ class EmailAdapter(BasePlatformAdapter):
         try:
             message_id = await asyncio.get_running_loop().run_in_executor(None, self._send_email_with_attachments, chat_id, "\n\n".join(body_parts), local_paths)
         except Exception as e:
-            logger.error("[Email] Multi-image send failed, falling back: %s", e, exc_info=True)
+            logger.exception("[Email] Multi-image send failed, falling back: %s", e)
             return await super().send_multiple_images(chat_id, images, metadata, human_delay)
         return SendResult(success=True, message_id=message_id)
 

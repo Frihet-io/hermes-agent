@@ -123,7 +123,7 @@ class SlashCommandsMixin:
         try:
             return contextvars.copy_context().run(_dispatch)
         except Exception as e:
-            logger.error("Slash command /%s error: %s", cmd, e, exc_info=True)
+            logger.exception("Slash command /%s error: %s", cmd, e)
             return f"Error executing /{cmd}: {e}"
         finally:
             if mutating:

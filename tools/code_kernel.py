@@ -901,7 +901,7 @@ def _run_cell(kernel: SessionKernel, key: Tuple, code: str, *, task_id: str, chi
             return json.dumps(result, ensure_ascii=False)
         except Exception as exc:  # pragma: no cover - defensive parity with per-call
             from tools.code_execution_tool import _error_result
-            logger.error("session kernel failed: %s: %s", type(exc).__name__, exc, exc_info=True)
+            logger.exception("session kernel failed: %s: %s", type(exc).__name__, exc)
             _REGISTRY.discard(key, kernel)
             return _error_result(str(exc), tool_calls_made=kernel.tool_call_counter[0],
                                  duration=round(time.monotonic() - exec_start, 2))

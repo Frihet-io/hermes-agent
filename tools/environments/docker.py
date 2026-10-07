@@ -504,7 +504,7 @@ def _ensure_docker_available() -> None:
             hint="Start Docker (e.g. `systemctl start docker` or launch Docker Desktop), then retry — "
                  "or run `hermes setup terminal` to switch to Local.")
     except Exception:
-        logger.error("Unexpected error while checking Docker availability.", exc_info=True)
+        logger.exception("Unexpected error while checking Docker availability.")
         raise
     if result.returncode != 0:
         raise _docker_unavailable(

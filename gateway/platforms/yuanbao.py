@@ -377,7 +377,7 @@ class InboundPipeline:
                 try:
                     await handler(ctx, next_fn)
                 except Exception:
-                    logger.error("[InboundPipeline] middleware [%s] error", name, exc_info=True)
+                    logger.exception("[InboundPipeline] middleware [%s] error", name)
                     raise
                 return
         await next_fn()
@@ -1827,7 +1827,7 @@ class ConnectionManager:
         except asyncio.TimeoutError:
             logger.error("[%s] Connection timed out", adapter.name)
         except Exception as exc:
-            logger.error("[%s] connect() failed: %s", adapter.name, exc, exc_info=True)
+            logger.exception("[%s] connect() failed: %s", adapter.name, exc)
         await self._cleanup_ws()
         adapter._release_platform_lock()
         return False
@@ -1920,7 +1920,7 @@ class ConnectionManager:
         except asyncio.TimeoutError:
             logger.error("[%s] AUTH_BIND timeout", adapter.name)
         except Exception as exc:
-            logger.error("[%s] AUTH_BIND error: %s", adapter.name, exc, exc_info=True)
+            logger.exception("[%s] AUTH_BIND error: %s", adapter.name, exc)
         return False
 
     def _pop_pending(self, msg_id: str) -> Optional[asyncio.Future]:
@@ -2214,7 +2214,7 @@ class MediaSendHandler(ABC):
         except ValueError as ve:
             return SendResult(success=False, error=str(ve))
         except Exception as exc:
-            logger.error("[%s] %s.handle() failed: %s", adapter.name, type(self).__name__, exc, exc_info=True)
+            logger.exception("[%s] %s.handle() failed: %s", adapter.name, type(self).__name__, exc)
             return SendResult(success=False, error=str(exc) or type(exc).__name__)
 
 

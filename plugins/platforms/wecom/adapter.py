@@ -179,7 +179,7 @@ class WeComAdapter(WeComStreamMixin, WeComMediaMixin, ChatSendQueueMixin, OwnAcc
             return True
         except Exception as exc:
             self._set_fatal_error("wecom_connect_error", f"WeCom startup failed: {exc}", retryable=True)
-            logger.error("[%s] Failed to connect: %s", self.name, exc, exc_info=True)
+            logger.exception("[%s] Failed to connect: %s", self.name, exc)
             await self._teardown()
             return False
 

@@ -477,7 +477,7 @@ class InProcessCronScheduler(CronScheduler):
             # immediately.
             record_ticker_heartbeat()
         except BaseException as e:
-            logger.error("Cron startup recovery error: %s", e, exc_info=True)
+            logger.exception("Cron startup recovery error: %s", e)
             _guarded_store_write(
                 record_ticker_error, "startup error", f"{type(e).__name__}: {e}"
             )
@@ -507,7 +507,7 @@ class InProcessCronScheduler(CronScheduler):
                     # Expected while a fresh gateway owns the lock; still recorded for status.
                     logger.info("Cron tick yielded: %s", e)
                 else:
-                    logger.error("Cron tick error: %s", e, exc_info=True)
+                    logger.exception("Cron tick error: %s", e)
                 # Persist the reason so `hermes cron status` (separate process) shows WHY.
                 _guarded_store_write(
                     record_ticker_error, "tick error", f"{type(e).__name__}: {e}"
@@ -581,8 +581,8 @@ class InProcessCronScheduler(CronScheduler):
                         )
                     record_ticker_heartbeat()
             except BaseException as e:
-                logger.error(
-                    "Cron startup recovery error for profile at %s: %s", home, e, exc_info=True
+                logger.exception(
+                    "Cron startup recovery error for profile at %s: %s", home, e
                 )
 
         consecutive_failures = 0
@@ -609,7 +609,7 @@ class InProcessCronScheduler(CronScheduler):
                 # must be reflected in that answer, not one cycle late.
                 register_ticked_homes([home for _name, home in cycle_homes])
             except BaseException as e:
-                logger.error("Cron profile enumeration error: %s", e, exc_info=True)
+                logger.exception("Cron profile enumeration error: %s", e)
                 _tick_error = f"{type(e).__name__}: {e}"
                 consecutive_failures = _note_tick_failure(e, consecutive_failures)
             try:
@@ -629,8 +629,8 @@ class InProcessCronScheduler(CronScheduler):
                             _profile_errors[str(home)] = f"{type(e).__name__}: {e}"
                         except BaseException as e:
                             # THIS profile only; BaseException as in the single-profile loop.
-                            logger.error(
-                                "Cron tick error for profile at %s: %s", home, e, exc_info=True
+                            logger.exception(
+                                "Cron tick error for profile at %s: %s", home, e
                             )
                             _profile_errors[str(home)] = f"{type(e).__name__}: {e}"
                             if _cycle_exc is None or _is_fd_exhaustion(e):
@@ -639,7 +639,7 @@ class InProcessCronScheduler(CronScheduler):
                     if _cycle_exc is not None:
                         consecutive_failures = _note_tick_failure(_cycle_exc, consecutive_failures)
             except BaseException as e:
-                logger.error("Cron tick error: %s", e, exc_info=True)
+                logger.exception("Cron tick error: %s", e)
                 _tick_error = f"{type(e).__name__}: {e}"
                 # EMFILE: reclaim fds + exponential backoff (#87644).
                 consecutive_failures = _note_tick_failure(e, consecutive_failures)

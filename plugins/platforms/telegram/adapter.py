@@ -4017,7 +4017,7 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                 await self._edit_text(chat_id, message_id, first_chunk)
         except Exception as e:
             if "not modified" not in str(e).lower():  # identical first chunk still sends continuations
-                logger.error("[%s] Overflow split: first-chunk edit failed: %s", self.name, _redact_telegram_error_text(e), exc_info=True)
+                logger.exception("[%s] Overflow split: first-chunk edit failed: %s", self.name, _redact_telegram_error_text(e))
                 return SendResult(success=False, error=_redact_telegram_error_text(e))
         # Continuations call self._bot.send_message directly to skip self.send's pre-chunking.
         continuation_ids: list[str] = []
@@ -4806,7 +4806,7 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                         ), str(thread_id), meta, reply_to_message_id=reply_to_id, reply_to_mode=self._reply_to_mode))
                 await self._send_message_with_thread_fallback(**send_kwargs)
         except Exception as exc:
-            logger.error("[%s] slash-confirm callback failed: %s", self.name, exc, exc_info=True)
+            logger.exception("[%s] slash-confirm callback failed: %s", self.name, exc)
 
     async def _handle_clarify_callback(self, query, data: str, cb: Dict[str, Any]) -> None:
         """``cl:<clarify_id>:<idx|other>`` — resolve a clarify prompt or flip to text capture."""
@@ -4952,7 +4952,7 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
             logger.error("[%s] gmail-triage callback timed out: verb=%s arg=%s", self.name, verb, arg)
         except Exception as exc:
             label = t("platform.telegram.gmail_triage.error", verb=verb, error=str(exc))
-            logger.error("[%s] gmail-triage callback exception: verb=%s arg=%s err=%s", self.name, verb, arg, exc, exc_info=True)
+            logger.exception("[%s] gmail-triage callback exception: verb=%s arg=%s err=%s", self.name, verb, arg, exc)
         await query.answer(text=label[:_TOAST_LIMIT])
         if not success:
             return
@@ -5208,9 +5208,9 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                         chat_id=chat_id, file_path=audio_path, caption=caption, reply_to=reply_to, metadata=metadata)
             return SendResult(success=True, message_id=str(msg.message_id))
         except Exception as e:
-            logger.error(
+            logger.exception(
                 "[%s] Failed to send Telegram voice/audio, falling back to base adapter: %s", self.name,
-                _redact_telegram_error_text(e), exc_info=True)
+                _redact_telegram_error_text(e))
             return await super().send_voice(chat_id, audio_path, caption, reply_to, metadata=metadata)
         finally:
             if _transcoded_voice_path:
@@ -5319,9 +5319,9 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                     chat_id=chat_id, file_path=actual_path, caption=caption, file_name=doc_name,
                     reply_to=reply_to, metadata=metadata)
             except Exception as doc_err:
-                logger.error(
+                logger.exception(
                     "[%s] Failed to send Telegram local image as document, falling back to base adapter: %s",
-                    self.name, doc_err, exc_info=True)
+                    self.name, doc_err)
                 return await super(TelegramAdapter, self).send_image_file(chat_id, image_path, caption, reply_to, metadata=metadata)
 
         try:
@@ -5430,7 +5430,7 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                     self._bot.send_photo, chat_id, reply_to, metadata, "uploaded photo", photo=image_data, caption=photo_caption)
                 return SendResult(success=True, message_id=str(msg.message_id))
             except Exception as e2:
-                logger.error("[%s] File upload send_photo also failed: %s", self.name, e2, exc_info=True)
+                logger.exception("[%s] File upload send_photo also failed: %s", self.name, e2)
                 return await super().send_image(chat_id, image_url, caption, reply_to, metadata=metadata)
 
     async def send_animation(
@@ -5445,9 +5445,9 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                 caption=self._caption_1024(caption))
             return SendResult(success=True, message_id=str(msg.message_id))
         except Exception as e:
-            logger.error(
+            logger.exception(
                 "[%s] Failed to send Telegram animation, falling back to photo: %s", self.name,
-                _redact_telegram_error_text(e), exc_info=True)
+                _redact_telegram_error_text(e))
             return await self.send_image(chat_id, animation_url, caption, reply_to, metadata=metadata)
 
     @staticmethod
@@ -5604,8 +5604,8 @@ class TelegramAdapter(TelegramHeldInboundMixin, BasePlatformAdapter):
                 "name": chat.title or chat.full_name or str(chat_id), "type": chat_type, "username": chat.username,
                 "is_forum": getattr(chat, "is_forum", False)}
         except Exception as e:
-            logger.error("[%s] Failed to get Telegram chat info for %s: %s", self.name, chat_id, _redact_telegram_error_text(
-                e), exc_info=True)
+            logger.exception("[%s] Failed to get Telegram chat info for %s: %s", self.name, chat_id, _redact_telegram_error_text(
+                e))
             return {"name": str(chat_id), "type": "dm", "error": str(e)}
 
     def format_message(self, content: str) -> str:

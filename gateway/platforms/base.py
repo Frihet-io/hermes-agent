@@ -2331,8 +2331,8 @@ class BasePlatformAdapter(ABC):
                 factory(native, self)
                 logger.info("[%s] Wired native handlers from plugin '%s'", self.name, plugin_name)
             except Exception as exc:
-                logger.error("[%s] Plugin '%s' handler factory raised: %s", self.name, plugin_name,
-                             exc, exc_info=True)
+                logger.exception("[%s] Plugin '%s' handler factory raised: %s", self.name, plugin_name,
+                             exc)
             # A raising factory is recorded too: re-wire must not re-raise it on every plugin load.
             self._plugin_handlers_wired.add(key)
 
@@ -3029,7 +3029,7 @@ class BasePlatformAdapter(ABC):
                 else:
                     delivered = True
             except Exception as img_err:
-                logger.error("[%s] Error sending image: %s", self.name, img_err, exc_info=True)
+                logger.exception("[%s] Error sending image: %s", self.name, img_err)
         if not images:
             return SendResult(success=False, error="no images to send")
         return SendResult(
@@ -4101,7 +4101,7 @@ class BasePlatformAdapter(ABC):
                                  self.name, cmd, session_key)
                     await self._dispatch_inline_reply(event)
             except Exception as e:
-                logger.error("[%s] Command '/%s' dispatch failed: %s", self.name, cmd, e, exc_info=True)
+                logger.exception("[%s] Command '/%s' dispatch failed: %s", self.name, cmd, e)
             return
         # Clarify bypass: while blocked on clarify_tool the next message must reach the
         # text-intercept so numeric/exact/"Other" answers resolve it and unblock the agent.
@@ -4121,13 +4121,13 @@ class BasePlatformAdapter(ABC):
                 try:
                     await self._dispatch_inline_reply(event)
                 except Exception as e:
-                    logger.error("[%s] Clarify text-intercept dispatch failed: %s", self.name, e, exc_info=True)
+                    logger.exception("[%s] Clarify text-intercept dispatch failed: %s", self.name, e)
                 return
         if self._busy_session_handler is not None:
             try:
                 handled = await self._busy_session_handler(event, session_key)
             except Exception as e:
-                logger.error("[%s] Busy-session handler failed: %s", self.name, e, exc_info=True)
+                logger.exception("[%s] Busy-session handler failed: %s", self.name, e)
                 # It may have stored the event before raising: queuing or starting it again below
                 # would run it twice.
                 handled = event._gateway_accepted is True
@@ -4436,8 +4436,8 @@ class BasePlatformAdapter(ABC):
                 return _thread_metadata
             await self.send(chat_id=event.source.chat_id, content=content, metadata=_thread_metadata)
         except Exception as notify_err:
-            logger.error(
-                "[%s] Failed to send error notification to user: %s", self.name, notify_err, exc_info=True)
+            logger.exception(
+                "[%s] Failed to send error notification to user: %s", self.name, notify_err)
         return _thread_metadata
 
     async def _deliver_attachments(self, event: MessageEvent, extracted: "_ExtractedResponse",
@@ -4665,7 +4665,7 @@ class BasePlatformAdapter(ABC):
             raise
         except BaseException as e:
             await self._run_processing_hook("on_processing_complete", event, ProcessingOutcome.FAILURE)
-            logger.error("[%s] Error handling message: %s", self.name, e, exc_info=True)
+            logger.exception("[%s] Error handling message: %s", self.name, e)
             _thread_metadata = (await self._notify_turn_error(event, e)) or _thread_metadata
             # SystemExit/KeyboardInterrupt propagate; other BaseExceptions are contained.
             if isinstance(e, (SystemExit, KeyboardInterrupt)):

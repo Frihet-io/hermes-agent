@@ -489,7 +489,7 @@ class _ResponsesStream:
             if isinstance(result, dict) and result.get("error") and not self.final_response_text:
                 self.agent_error = self._api._redact_api_error_text(result["error"])
         except Exception as e:  # noqa: BLE001
-            logger.error("Error running agent for streaming responses: %s", e, exc_info=True)
+            logger.exception("Error running agent for streaming responses: %s", e)
             self.agent_error = self._api._redact_api_error_text(e)
 
     async def close_message_item(self) -> None:
@@ -865,7 +865,7 @@ class OpenAICompatRoutesMixin:
                 result, usage = await compute()
             return (result, usage), None
         except Exception as e:
-            logger.error("Error running agent for %s: %s", log_label, e, exc_info=True)
+            logger.exception("Error running agent for %s: %s", log_label, e)
             message = "" if getattr(e, "_notification_presentation_suppressed", False) is True else f"Internal server error: {e}"
             return None, _error_response(message, 500, err_type="server_error")
 

@@ -71,7 +71,7 @@ def _loud(fn, log_msg, error_prefix, *log_args):
     try:
         return fn(), None
     except Exception as e:
-        logging.error(log_msg, *log_args, e, exc_info=True)
+        logging.exception(log_msg, *log_args, e)
         return None, tool_error(f"{error_prefix}: {e}", success=False)
 
 

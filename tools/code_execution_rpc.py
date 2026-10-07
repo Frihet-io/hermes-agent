@@ -105,7 +105,7 @@ def _handle_rpc_request(request: dict, *, allowed_tools: frozenset, tool_call_co
         with thread_scoped_silence():
             result = dispatch(tool_name, tool_args)
     except Exception as exc:
-        logger.error("Tool call failed in %s: %s", where, exc, exc_info=True)
+        logger.exception("Tool call failed in %s: %s", where, exc)
         result = tool_error(str(exc))
     tool_call_counter[0] += 1
     entry = {"tool": tool_name, "args_preview": str(tool_args)[:80],

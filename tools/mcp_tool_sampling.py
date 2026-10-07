@@ -320,6 +320,6 @@ class ElicitationHandler:
             logger.warning("MCP server '%s' elicitation timed out after %ds", self.server_name, int(self.timeout))
             return self._result("cancel", "errors")
         except Exception as exc:
-            logger.error("MCP server '%s' elicitation failed: %s", self.server_name, exc, exc_info=True)
+            logger.exception("MCP server '%s' elicitation failed: %s", self.server_name, exc)
             return self._result("decline", "errors")
         return self._result(*self._ANSWER_RESULTS.get(answer, ("decline", "declined")))

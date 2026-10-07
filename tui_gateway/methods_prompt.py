@@ -505,10 +505,10 @@ def _truncate_history_for_submit(rid, sid, session, params, requested_rebind_ids
                     truncation_key, truncated, active_only=True, archive_dropped=True,
                     reject_active_turn_lease=True)
             except Exception as exc:
-                logger.error(
+                logger.exception(
                     "prompt.submit: replace_messages failed for session %s (ordinal=%d); refusing "
                     "turn so memory and DB stay aligned: %s",
-                    sid, ordinal, exc, exc_info=True)
+                    sid, ordinal, exc)
                 return _err(rid, 5008, f"failed to persist history truncation: {exc}"), {}
             # Surface the survivors' live ids so the client rebinds its cached rowIds
             # (a strict-prefix cut keeps them unchanged since #82956; a divergent

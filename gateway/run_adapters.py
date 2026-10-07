@@ -1004,7 +1004,7 @@ class GatewayAdapterLifecycleMixin:
             except MultiplexConfigError:
                 raise
             except Exception as e:
-                logger.error("Failed to start adapters for profile '%s': %s", profile_name, e, exc_info=True)
+                logger.exception("Failed to start adapters for profile '%s': %s", profile_name, e)
                 # Not acknowledged: the reconcile watcher retries a transiently-failed profile.
                 transient_failed.add(profile_name)
             else:

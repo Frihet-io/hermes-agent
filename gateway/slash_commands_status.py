@@ -696,5 +696,5 @@ class GatewayStatusCommandsMixin:
             # EMPTY context and would read the DEFAULT profile's state.db.
             return await self._run_in_executor_with_context(_run_insights)
         except Exception as e:
-            logger.error("Insights command error: %s", e, exc_info=True)
+            logger.exception("Insights command error: %s", e)
             return t("gateway.insights.error", error=e)
